@@ -5,6 +5,7 @@ using System.Data;
 using System.Linq.Expressions;
 using System.Runtime.Serialization;
 using System.Security.Permissions;
+using System.Threading;
 using Iesi.Collections;
 
 using NHibernate.AdoNet;
@@ -394,35 +395,50 @@ namespace NHibernate.Impl
 		/// and that all of the softlocks in the <see cref="Cache"/> have
 		/// been released.
 		/// </summary>
+        private AutoResetEvent afterTransactionCompletionLock = new AutoResetEvent(true);
 		public override void AfterTransactionCompletion(bool success, ITransaction tx)
 		{
-			using (new SessionIdLoggingContext(SessionId))
-			{
-				log.Debug("transaction completion");
-				if (Factory.Statistics.IsStatisticsEnabled)
-				{
-					Factory.StatisticsImplementor.EndTransaction(success);
-				}
+            if (!this.afterTransactionCompletionLock.WaitOne(TimeSpan.FromSeconds(30), false))
+            {
+                log.Error("Hack preventing AfterTransactionCompletion concurrent execution has timeouted. Another thread is inside AfterTransactionCompletion too long.");
+                return;
+            }
 
-				connectionManager.AfterTransaction();
-				persistenceContext.AfterTransactionCompletion();
-				actionQueue.AfterTransactionCompletion(success);
-				if (rootSession == null)
-				{
-					try
-					{
-						interceptor.AfterTransactionCompletion(tx);
-					}
-					catch (Exception t)
-					{
-						log.Error("exception in interceptor afterTransactionCompletion()", t);
-					}
-				}
+            try
+            {
+
+                using (new SessionIdLoggingContext(SessionId))
+                {
+                    log.Debug("transaction completion");
+                    if (Factory.Statistics.IsStatisticsEnabled)
+                    {
+                        Factory.StatisticsImplementor.EndTransaction(success);
+                    }
+
+                    connectionManager.AfterTransaction();
+                    persistenceContext.AfterTransactionCompletion();
+                    actionQueue.AfterTransactionCompletion(success);
+                    if (rootSession == null)
+                    {
+                        try
+                        {
+                            interceptor.AfterTransactionCompletion(tx);
+                        }
+                        catch (Exception t)
+                        {
+                            log.Error("exception in interceptor afterTransactionCompletion()", t);
+                        }
+                    }
 
 
-				//if (autoClear)
-				//	Clear();
-			}
+                    //if (autoClear)
+                    //	Clear();
+                }
+            }
+            finally
+            {
+                this.afterTransactionCompletionLock.Set();
+            }
 		}
 
 		private void Cleanup()
