@@ -4,6 +4,7 @@ using System.Data.Common;
 using System.Text;
 using NHibernate.AdoNet.Util;
 using NHibernate.Exceptions;
+using NHibernate.SqlCommand;
 using NHibernate.Util;
 
 namespace NHibernate.AdoNet
@@ -23,11 +24,7 @@ namespace NHibernate.AdoNet
 			_defaultTimeout = PropertiesHelper.GetInt32(Cfg.Environment.CommandTimeout, Cfg.Environment.Properties, -1);
 
 			_currentBatch = CreateConfiguredBatch();
-			//we always create this, because we need to deal with a scenario in which
-			//the user change the logging configuration at runtime. Trying to put this
-			//behind an if(log.IsDebugEnabled) will cause a null reference exception 
-			//at that point.
-			_currentBatchCommandsLog = new StringBuilder().AppendLine("Batch commands:");
+			
 		}
 
 		public override int BatchSize
@@ -46,18 +43,12 @@ namespace NHibernate.AdoNet
 			_totalExpectedRowsAffected += expectation.ExpectedRowCount;
 			IDbCommand batchUpdate = CurrentCommand;
 			Driver.AdjustCommand(batchUpdate);
-			string lineWithParameters = null;
-			var sqlStatementLogger = Factory.Settings.SqlStatementLogger;
-			if (sqlStatementLogger.IsDebugEnabled || Log.IsDebugEnabled)
-			{
-				lineWithParameters = sqlStatementLogger.GetCommandLineWithParameters(batchUpdate);
-				var formatStyle = sqlStatementLogger.DetermineActualStyle(FormatStyle.Basic);
-				lineWithParameters = formatStyle.Formatter.Format(lineWithParameters);
-				_currentBatchCommandsLog.Append("command ")
-					.Append(_currentBatch.CountOfCommands)
-					.Append(":")
-					.AppendLine(lineWithParameters);
-			}
+			
+                        //Always append batch command with parameters to the current batch log - will be used in case of a db exception
+			var lineWithParameters = GetFormattedCommandLineWithParameters(batchUpdate);
+		        _currentBatchCommandsLog.AppendFormat("Command {0}:", _currentBatch.CountOfCommands)
+				.AppendLine(lineWithParameters);
+			
 			if (Log.IsDebugEnabled)
 			{
 				Log.Debug("Adding to batch:" + lineWithParameters);
@@ -70,15 +61,26 @@ namespace NHibernate.AdoNet
 			}
 		}
 
-		protected override void DoExecuteBatch(IDbCommand ps)
+	        protected virtual string GetFormattedCommandLineWithParameters(IDbCommand batchUpdate)
+	        {
+                    var sqlStatementLogger = Factory.Settings.SqlStatementLogger;
+                    var lineWithParameters = sqlStatementLogger.GetCommandLineWithParameters(batchUpdate);
+	        
+                    var formatStyle = sqlStatementLogger.DetermineActualStyle(FormatStyle.Basic);
+	            lineWithParameters = formatStyle.Formatter.Format(lineWithParameters);
+
+	            return lineWithParameters;
+	        }
+
+	        protected override void DoExecuteBatch(IDbCommand ps)
 		{
 			Log.DebugFormat("Executing batch");
 			CheckReaders();
 			Prepare(_currentBatch.BatchCommand);
+		        var currentBatchCommandsLog = _currentBatchCommandsLog.ToString();
 			if (Factory.Settings.SqlStatementLogger.IsDebugEnabled)
 			{
-				Factory.Settings.SqlStatementLogger.LogBatchCommand(_currentBatchCommandsLog.ToString());
-				_currentBatchCommandsLog = new StringBuilder().AppendLine("Batch commands:");
+				Factory.Settings.SqlStatementLogger.LogBatchCommand(currentBatchCommandsLog);
 			}
 
 			int rowsAffected;
@@ -88,7 +90,7 @@ namespace NHibernate.AdoNet
 			}
 			catch (DbException e)
 			{
-				throw ADOExceptionHelper.Convert(Factory.SQLExceptionConverter, e, "could not execute batch command.");
+                                throw ADOExceptionHelper.Convert(Factory.SQLExceptionConverter, e, "could not execute batch command.", new SqlString(currentBatchCommandsLog));
 			}
 
 			Expectations.VerifyOutcomeBatched(_totalExpectedRowsAffected, rowsAffected);
@@ -115,6 +117,12 @@ namespace NHibernate.AdoNet
 					}
 				}
 			}
+
+                        //we always create this, because we need to deal with a scenario in which
+                        //the user change the logging configuration at runtime. Trying to put this
+                        //behind an if(log.IsDebugEnabled) will cause a null reference exception 
+                        //at that point.
+                        _currentBatchCommandsLog = new StringBuilder().AppendLine("Batch commands:");
 
 			return result;
 		}
