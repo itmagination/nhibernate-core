@@ -1,5 +1,5 @@
 using System.Collections;
-using Iesi.Collections;
+using System.Collections.Generic;
 
 namespace NHibernate.Test.Hql.Ast
 {
@@ -9,7 +9,7 @@ namespace NHibernate.Test.Hql.Ast
 		private string nickName;
 		private ICollection friends;
 		private ICollection pets;
-		private IDictionary family;
+		private IDictionary<string, Human> family;
 		private double height;
 
 		private long bigIntegerValue;
@@ -17,8 +17,8 @@ namespace NHibernate.Test.Hql.Ast
 		private int intValue;
 		private float floatValue;
 
-		private ISet nickNames;
-		private IDictionary addresses;
+		private ISet<string> nickNames;
+		private IDictionary<string, Address> addresses;
 
 		public virtual Name Name
 		{
@@ -44,7 +44,7 @@ namespace NHibernate.Test.Hql.Ast
 			set { pets = value; }
 		}
 
-		public virtual IDictionary Family
+		public virtual IDictionary<string, Human> Family
 		{
 			get { return family; }
 			set { family = value; }
@@ -80,13 +80,13 @@ namespace NHibernate.Test.Hql.Ast
 			set { floatValue = value; }
 		}
 
-		public virtual ISet NickNames
+		public virtual ISet<string> NickNames
 		{
 			get { return nickNames; }
 			set { nickNames = value; }
 		}
 
-		public virtual IDictionary Addresses
+		public virtual IDictionary<string, Address> Addresses
 		{
 			get { return addresses; }
 			set { addresses = value; }

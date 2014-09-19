@@ -1,7 +1,5 @@
 using System;
-using System.Collections;
-
-using Iesi.Collections;
+using System.Collections.Generic;
 
 namespace NHibernate.DomainModel
 {
@@ -83,45 +81,45 @@ namespace NHibernate.DomainModel
 		}
 
 
-		private IList _oneToMany;
-		private IList _components;
-		private IList _manyToMany;
+		private IList<Simple> _oneToMany;
+		private IList<ContainerInnerClass> _components;
+		private IList<Simple> _manyToMany;
 		// <set> mapping
-		private ISet _composites;
-		private IList _cascades;
+		private ISet<ContainerInnerClass> _composites;
+		private IList<ContainerInnerClass> _cascades;
 		private long _id;
-		private IList _bag;
-		private IList _lazyBag = new ArrayList();
-		private IDictionary _ternaryMap;
+		private IList<Contained> _bag;
+		private IList<Contained> _lazyBag = new List<Contained>();
+		private IDictionary<string, Ternary> _ternaryMap;
 		//<set> mapping
-		private ISet _ternarySet;
+		private ISet<Ternary> _ternarySet;
 
 
-		public virtual IList OneToMany
+		public virtual IList<Simple> OneToMany
 		{
 			get { return _oneToMany; }
 			set { _oneToMany = value; }
 		}
 
-		public virtual IList ManyToMany
+		public virtual IList<Simple> ManyToMany
 		{
 			get { return _manyToMany; }
 			set { _manyToMany = value; }
 		}
 
-		public virtual IList Components
+		public virtual IList<ContainerInnerClass> Components
 		{
 			get { return _components; }
 			set { _components = value; }
 		}
 
-		public virtual ISet Composites
+		public virtual ISet<ContainerInnerClass> Composites
 		{
 			get { return _composites; }
 			set { _composites = value; }
 		}
 
-		public virtual IList Cascades
+		public virtual IList<ContainerInnerClass> Cascades
 		{
 			get { return _cascades; }
 			set { _cascades = value; }
@@ -133,25 +131,25 @@ namespace NHibernate.DomainModel
 			set { _id = value; }
 		}
 
-		public virtual IList Bag
+		public virtual IList<Contained> Bag
 		{
 			get { return _bag; }
 			set { _bag = value; }
 		}
 
-		public virtual IList LazyBag
+		public virtual IList<Contained> LazyBag
 		{
 			get { return _lazyBag; }
 			set { _lazyBag = value; }
 		}
 
-		public virtual IDictionary TernaryMap
+		public virtual IDictionary<string, Ternary> TernaryMap
 		{
 			get { return _ternaryMap; }
 			set { _ternaryMap = value; }
 		}
 
-		public virtual ISet TernarySet
+		public virtual ISet<Ternary> TernarySet
 		{
 			get { return _ternarySet; }
 			set { _ternarySet = value; }

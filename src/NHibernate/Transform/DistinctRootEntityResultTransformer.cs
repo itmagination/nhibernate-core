@@ -1,13 +1,13 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-using Iesi.Collections.Generic;
 
 namespace NHibernate.Transform
 {
 	[Serializable]
-	public class DistinctRootEntityResultTransformer : IResultTransformer
+	public class DistinctRootEntityResultTransformer : IResultTransformer, ITupleSubsetResultTransformer
 	{
 		private static readonly IInternalLogger log = LoggerProvider.LoggerFor(typeof(DistinctRootEntityResultTransformer));
 		private static readonly object Hasher = new object();
@@ -41,7 +41,7 @@ namespace NHibernate.Transform
 		public IList TransformList(IList list)
 		{
 			IList result = (IList)Activator.CreateInstance(list.GetType());
-			ISet<Identity> distinct = new HashedSet<Identity>();
+			var distinct = new HashSet<Identity>();
 
 			for (int i = 0; i < list.Count; i++)
 			{
@@ -55,9 +55,25 @@ namespace NHibernate.Transform
 			if (log.IsDebugEnabled)
 			{
 				log.Debug(string.Format("transformed: {0} rows to: {1} distinct results",
-				                        list.Count, result.Count));
+										list.Count, result.Count));
 			}
 			return result;
+		}
+
+
+		public bool[] IncludeInTransform(String[] aliases, int tupleLength)
+		{
+			//return RootEntityResultTransformer.INSTANCE.includeInTransform(aliases, tupleLength);
+			var transformer = new RootEntityResultTransformer();
+			return transformer.IncludeInTransform(aliases, tupleLength);
+		}
+
+
+		public bool IsTransformedValueATupleElement(String[] aliases, int tupleLength)
+		{
+			//return RootEntityResultTransformer.INSTANCE.isTransformedValueATupleElement(null, tupleLength);
+			var transformer = new RootEntityResultTransformer();
+			return transformer.IsTransformedValueATupleElement(null, tupleLength);
 		}
 
 		public override bool Equals(object obj)

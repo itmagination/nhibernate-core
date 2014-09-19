@@ -1,13 +1,20 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
-using NHibernate.SqlCommand;
+
 
 namespace NHibernate.Util
 {
 	/// <summary></summary>
 	public static class StringHelper
 	{
+		/// <summary>
+		/// This allows for both CRLF and lone LF line separators.
+		/// </summary>
+		internal static readonly string[] LineSeparators = {"\r\n", "\n"};
+
 		public const string WhiteSpace = " \n\r\f\t";
 
 		/// <summary></summary>
@@ -55,37 +62,9 @@ namespace NHibernate.Util
 			return buf.ToString();
 		}
 
-		public static SqlString Join(SqlString separator, IEnumerable objects)
+		internal static string Join<T>(string separator, IEnumerable<T> objects)
 		{
-			SqlStringBuilder buf = new SqlStringBuilder();
-			bool first = true;
-
-			foreach (object obj in objects)
-			{
-				if (!first)
-				{
-					buf.Add(separator);
-				}
-
-				first = false;
-				buf.AddObject(obj);
-			}
-
-			return buf.ToSqlString();
-		}
-
-		public static SqlString[] Add(SqlString[] x, string sep, SqlString[] y)
-		{
-			SqlString[] result = new SqlString[x.Length];
-			for (int i = 0; i < x.Length; i++)
-			{
-				result[i] = new SqlStringBuilder(3)
-					.Add(x[i])
-					.Add(sep)
-					.Add(y[i])
-					.ToSqlString();
-			}
-			return result;
+			return string.Join(separator, objects);
 		}
 
 		/// <summary>
@@ -111,8 +90,14 @@ namespace NHibernate.Util
 
 		public static string Replace(string template, string placeholder, string replacement, bool wholeWords)
 		{
+			Predicate<string> isWholeWord = c => WhiteSpace.Contains(c) || ClosedParen.Equals(c) || Comma.Equals(c);
+			return ReplaceByPredicate(template, placeholder, replacement, wholeWords, isWholeWord);
+		}
+
+		private static string ReplaceByPredicate(string template, string placeholder, string replacement, bool useWholeWord, Predicate<string> isWholeWord)
+		{
 			// sometimes a null value will get passed in here -> SqlWhereStrings are a good example
-			if (template == null)
+			if (string.IsNullOrWhiteSpace(template))
 			{
 				return null;
 			}
@@ -126,21 +111,28 @@ namespace NHibernate.Util
 			{
 				// NH different implementation (NH-1253)
 				string replaceWith = replacement;
-				if(loc + placeholder.Length < template.Length)
+				if (loc + placeholder.Length < template.Length)
 				{
 					string afterPlaceholder = template[loc + placeholder.Length].ToString();
 					//After a token in HQL there can be whitespace, closedparen or comma.. 
-					if(wholeWords && !(WhiteSpace.Contains(afterPlaceholder) || ClosedParen.Equals(afterPlaceholder) || Comma.Equals(afterPlaceholder)))
+					if (useWholeWord && !isWholeWord(afterPlaceholder))
 					{
 						//If this is not a full token we don't want to touch it
 						replaceWith = placeholder;
 					}
 				}
 
-				return
-					new StringBuilder(template.Substring(0, loc)).Append(replaceWith).Append(
-						Replace(template.Substring(loc + placeholder.Length), placeholder, replacement, wholeWords)).ToString();
+				return new StringBuilder(template.Substring(0, loc))
+					.Append(replaceWith)
+					.Append(ReplaceByPredicate(template.Substring(loc + placeholder.Length), placeholder, replacement, useWholeWord, isWholeWord))
+					.ToString();
 			}
+		}
+
+		public static string ReplaceWholeWord(this string template, string placeholder, string replacement)
+		{
+			Predicate<string> isWholeWord = s => !Char.IsLetterOrDigit(s[0]);
+			return ReplaceByPredicate(template, placeholder, replacement, true, isWholeWord);
 		}
 
 		/// <summary>
@@ -192,13 +184,8 @@ namespace NHibernate.Util
 		/// </remarks>
 		public static string[] Split(string separators, string list, bool include)
 		{
-			StringTokenizer tokens = new StringTokenizer(list, separators, include);
-			ArrayList results = new ArrayList();
-			foreach (string token in tokens)
-			{
-				results.Add(token);
-			}
-			return (string[])results.ToArray(typeof(string));
+			var tokens = new StringTokenizer(list, separators, include);
+			return tokens.ToArray();
 		}
 
 		/// <summary>
@@ -208,7 +195,7 @@ namespace NHibernate.Util
 		/// <returns></returns>
 		public static string Unqualify(string qualifiedName)
 		{
-			if(qualifiedName.IndexOf('`') > 0)
+			if (qualifiedName.IndexOf('`') > 0)
 			{
 				// less performance but correctly manage generics classes
 				// where the entity-name was not specified
@@ -391,11 +378,11 @@ namespace NHibernate.Util
 
 		public static string LinesToString(this string[] text)
 		{
-			if(text == null)
+			if (text == null)
 			{
 				return null;
 			}
-			if(text.Length == 1)
+			if (text.Length == 1)
 			{
 				return text[0];
 			}
@@ -494,15 +481,6 @@ namespace NHibernate.Util
 			return !IsEmpty(str);
 		}
 
-		public static bool IsNotEmpty(SqlString str)
-		{
-			return !IsEmpty(str);
-		}
-
-		public static bool IsEmpty(SqlString str)
-		{
-			return str == null || str.Count == 0;
-		}
 
 		/// <summary>
 		/// 
@@ -534,7 +512,7 @@ namespace NHibernate.Util
 				string[] qualified = new string[len];
 				for (int i = 0; i < len; i++)
 				{
-					qualified[i] = Qualify(prefix, names[i]);
+					qualified[i] = names[i] == null ? null : Qualify(prefix, names[i]);
 				}
 				return qualified;
 			}
@@ -625,11 +603,11 @@ namespace NHibernate.Util
 			{
 				return result + "x"; //ick!
 			}
-			if(char.IsLetter(result[0]) || '_' == result[0])
+			if (char.IsLetter(result[0]) || '_' == result[0])
 			{
 				return result;
 			}
-		    return "alias_" + result;
+			return "alias_" + result;
 		}
 
 		public static string MoveAndToBeginning(string filter)
@@ -703,9 +681,9 @@ namespace NHibernate.Util
 			return str;
 		}
 
-		public static string CollectionToString(ICollection keys)
+		public static string CollectionToString(IEnumerable keys)
 		{
-			StringBuilder sb = new StringBuilder();
+			var sb = new StringBuilder();
 			foreach (object o in keys)
 			{
 				sb.Append(o);
@@ -714,14 +692,7 @@ namespace NHibernate.Util
 			if (sb.Length != 0)//remove last ", "
 				sb.Remove(sb.Length - 2, 2);
 			return sb.ToString();
-
 		}
-
-		public static SqlString RemoveAsAliasesFromSql(SqlString sql)
-		{
-			return sql.Substring(0, sql.LastIndexOfCaseInsensitive(" as "));
-		}
-
 
 		public static string ToUpperCase(string str)
 		{
@@ -757,6 +728,54 @@ namespace NHibernate.Util
 			string filterName = filterParameterName.Substring(0, dot);
 			string parameterName = filterParameterName.Substring(dot + 1);
 			return new[] { filterName, parameterName };
+		}
+
+
+		/// <summary>
+		/// Return the index of the next line separator, starting at startIndex. If will match
+		/// the first CRLF or LF line separator. If there is no match, -1 will be returned. When
+		/// returning, newLineLength will be set to the number of characters in the matched line
+		/// separator (1 if LF was found, 2 if CRLF was found).
+		/// </summary>
+		public static int IndexOfAnyNewLine(this string str, int startIndex, out int newLineLength)
+		{
+			newLineLength = 0;
+			var matchStartIdx = str.IndexOfAny(new[] {'\r', '\n'}, startIndex);
+
+			if (matchStartIdx == -1)
+				return -1;
+
+			if (string.Compare(str, matchStartIdx, "\r\n", 0, 2, StringComparison.OrdinalIgnoreCase) == 0)
+				newLineLength = 2;
+			else
+				newLineLength = 1;
+
+			return matchStartIdx;
+		}
+
+
+		/// <summary>
+		/// Check if the given index points to a line separator in the string. Both CRLF and LF
+		/// line separators are handled. When returning, newLineLength will be set to the number
+		/// of characters matched in the line separator. It will be 2 if a CRLF matched, 1 if LF
+		/// matched, and 0 if the index doesn't indicate (the start of) a line separator.
+		/// </summary>
+		public static bool IsAnyNewLine(this string str, int index, out int newLineLength)
+		{
+			if (string.Compare(str, index, "\r\n", 0, 2, StringComparison.OrdinalIgnoreCase) == 0)
+			{
+				newLineLength = 2;
+				return true;
+			}
+
+			if (index < str.Length && str[index] == '\n')
+			{
+				newLineLength = 1;
+				return true;
+			}
+
+			newLineLength = 0;
+			return false;
 		}
 	}
 }

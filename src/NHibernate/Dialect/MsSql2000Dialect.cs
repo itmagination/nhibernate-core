@@ -9,6 +9,7 @@ using NHibernate.Driver;
 using NHibernate.Engine;
 using NHibernate.Mapping;
 using NHibernate.SqlCommand;
+using NHibernate.SqlCommand.Parser;
 using NHibernate.Type;
 using NHibernate.Util;
 using Environment = NHibernate.Cfg.Environment;
@@ -109,6 +110,8 @@ namespace NHibernate.Dialect
 			RegisterFunction("floor", new StandardSQLFunction("floor"));
 			RegisterFunction("round", new StandardSQLFunction("round"));
 
+			RegisterFunction("power", new StandardSQLFunction("power", NHibernateUtil.Double));
+
 			RegisterFunction("acos", new StandardSQLFunction("acos", NHibernateUtil.Double));
 			RegisterFunction("asin", new StandardSQLFunction("asin", NHibernateUtil.Double));
 			RegisterFunction("atan", new StandardSQLFunction("atan", NHibernateUtil.Double));
@@ -193,7 +196,7 @@ namespace NHibernate.Dialect
 			RegisterColumnType(DbType.Currency, "MONEY");
 			RegisterColumnType(DbType.Decimal, "DECIMAL(19,5)");
 			RegisterColumnType(DbType.Decimal, 19, "DECIMAL($p, $s)");
-			RegisterColumnType(DbType.Double, "DOUBLE PRECISION"); //synonym for FLOAT(53)
+			RegisterColumnType(DbType.Double, "FLOAT(53)");
 			RegisterColumnType(DbType.Int16, "SMALLINT");
 			RegisterColumnType(DbType.Int32, "INT");
 			RegisterColumnType(DbType.Int64, "BIGINT");
@@ -340,15 +343,11 @@ namespace NHibernate.Dialect
 
 		public override SqlString GetLimitString(SqlString querySqlString, SqlString offset, SqlString limit)
 		{
-			/*
-			 * "SELECT TOP limit rest-of-sql-statement"
-			 */
+			var tokenEnum = new SqlTokenizer(querySqlString).GetEnumerator();
+			if (!tokenEnum.TryParseUntilFirstMsSqlSelectColumn()) return null;
 
-			SqlStringBuilder topFragment = new SqlStringBuilder();
-			topFragment.Add(" top ");
-			topFragment.Add(limit);
-
-			return querySqlString.Insert(GetAfterSelectInsertPoint(querySqlString), topFragment.ToSqlString());
+			int insertPoint = tokenEnum.Current.SqlIndex;
+			return querySqlString.Insert(insertPoint, new SqlString("top ", limit, " "));
 		}
 
 		/// <summary>
@@ -396,19 +395,6 @@ namespace NHibernate.Dialect
 			}
 
 			return quoted.Replace(new string(CloseQuote, 2), CloseQuote.ToString());
-		}
-
-		private static int GetAfterSelectInsertPoint(SqlString sql)
-		{
-			if (sql.StartsWithCaseInsensitive("select distinct"))
-			{
-				return 15;
-			}
-			else if (sql.StartsWithCaseInsensitive("select"))
-			{
-				return 6;
-			}
-			throw new NotSupportedException("The query should start with 'SELECT' or 'SELECT DISTINCT'");
 		}
 
 		protected bool NeedsLockHint(LockMode lockMode)
@@ -546,7 +532,7 @@ namespace NHibernate.Dialect
 				// in various kinds of "FROM table1 alias1, table2 alias2".
 				_matchRegex = new Regex(" (" + aliasesPattern + ")([, ]|$)");
 				_unionSubclassRegex = new Regex(@"from\s+\(((?:.|\r|\n)*)\)(?:\s+as)?\s+(?<alias>" + aliasesPattern + ")", RegexOptions.IgnoreCase | RegexOptions.Multiline);
-			}
+	}
 
 			public SqlString AppendLockHint(SqlString sql)
 			{
@@ -558,7 +544,7 @@ namespace NHibernate.Dialect
 					{
 						result.Add((Parameter)part);
 						continue;
-					}
+}
 
 					result.Add(ProcessUnionSubclassCase((string)part) ?? _matchRegex.Replace((string)part, ReplaceMatch));
 				}

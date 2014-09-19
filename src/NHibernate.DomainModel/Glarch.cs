@@ -1,8 +1,6 @@
 using System;
 using System.Collections;
-
-using Iesi.Collections;
-
+using System.Collections.Generic;
 using NHibernate.Classic;
 
 namespace NHibernate.DomainModel
@@ -13,11 +11,11 @@ namespace NHibernate.DomainModel
 		private int _version;
 		private GlarchProxy _next;
 		private short _order;
-		private IList _strings;
-		private ISet _stringSets;
-		private IList _fooComponents;
+		private IList<string> _strings;
+		private ISet<string> _stringSets;
+		private IList<FooComponent> _fooComponents;
 		private GlarchProxy[] _proxyArray;
-		private ISet _proxySet;
+		private ISet<GlarchProxy> _proxySet;
 
 		[NonSerialized]
 		private IDictionary _dynaBean;
@@ -64,7 +62,7 @@ namespace NHibernate.DomainModel
 		/// <summary>
 		/// Gets or sets the _strings
 		/// </summary> 
-		public IList Strings
+		public IList<string> Strings
 		{
 			get { return _strings; }
 			set { _strings = value; }
@@ -75,7 +73,7 @@ namespace NHibernate.DomainModel
 		/// Gets or sets the _stringSets
 		/// </summary> 
 		//TODO: figure out why this is not in the mapping???
-		public ISet StringSets
+		public ISet<string> StringSets
 		{
 			get { return _stringSets; }
 			set { _stringSets = value; }
@@ -85,7 +83,7 @@ namespace NHibernate.DomainModel
 		/// <summary>
 		/// Gets or sets the _fooComponents
 		/// </summary> 
-		public IList FooComponents
+		public IList<FooComponent> FooComponents
 		{
 			get { return _fooComponents; }
 			set { _fooComponents = value; }
@@ -105,7 +103,7 @@ namespace NHibernate.DomainModel
 		/// <summary>
 		/// Gets or sets the _proxySet
 		/// </summary> 
-		public ISet ProxySet
+		public ISet<GlarchProxy> ProxySet
 		{
 			get { return _proxySet; }
 			set { _proxySet = value; }
@@ -128,7 +126,7 @@ namespace NHibernate.DomainModel
 
 		public LifecycleVeto OnSave(ISession s)
 		{
-			_dynaBean = new Hashtable();
+			_dynaBean = new Dictionary<string, object>();
 			_dynaBean["foo"] = "foo";
 			_dynaBean["bar"] = 66;
 			_immutable = "never changes!";

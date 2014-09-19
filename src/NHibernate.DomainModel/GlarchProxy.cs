@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
-
-using Iesi.Collections;
+using System.Collections.Generic;
 
 namespace NHibernate.DomainModel
 {
@@ -16,14 +15,14 @@ namespace NHibernate.DomainModel
 
 		short Order { get; set; }
 
-		IList Strings { get; set; }
+		IList<string> Strings { get; set; }
 
 		IDictionary DynaBean { get; set; }
 
-		ISet StringSets { get; set; }
-		IList FooComponents { get; set; }
+		ISet<string> StringSets { get; set; }
+		IList<FooComponent> FooComponents { get; set; }
 		GlarchProxy[] ProxyArray { get; set; }
-		ISet ProxySet { get; set; }
+		ISet<GlarchProxy> ProxySet { get; set; }
 		Multiplicity Multiple { get; set; }
 		object Any { get; set; }
 	}

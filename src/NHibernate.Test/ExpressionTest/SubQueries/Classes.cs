@@ -1,13 +1,12 @@
 using System;
-using System.Collections;
-using Iesi.Collections;
+using System.Collections.Generic;
 
 namespace NHibernate.Test.ExpressionTest.SubQueries
 {
 	public class Blog
 	{
-		private ISet _posts;
-		private ISet _users;
+		private ISet<Post> _posts;
+		private ISet<User> _users;
 
 		private int blog_id;
 
@@ -25,13 +24,13 @@ namespace NHibernate.Test.ExpressionTest.SubQueries
 			set { blog_name = value; }
 		}
 
-		public virtual ISet Posts
+		public virtual ISet<Post> Posts
 		{
 			get { return _posts; }
 			set { _posts = value; }
 		}
 
-		public virtual ISet Users
+		public virtual ISet<User> Users
 		{
 			get { return _users; }
 			set { _users = value; }
@@ -39,8 +38,8 @@ namespace NHibernate.Test.ExpressionTest.SubQueries
 
 		public Blog()
 		{
-			_posts = new HashedSet();
-			_users = new HashedSet();
+			_posts = new HashSet<Post>();
+			_users = new HashSet<User>();
 		}
 
 		public Blog(string name)
@@ -104,16 +103,16 @@ namespace NHibernate.Test.ExpressionTest.SubQueries
 		private int post_id;
 		private Blog _blog;
 		private string post_title;
-		private IList _comments;
-		private ISet categories = new HashedSet();
+		private IList<Comment> _comments;
+		private ISet<Category> categories = new HashSet<Category>();
 
-		public ISet Categories
+		public ISet<Category> Categories
 		{
 			get { return categories; }
 			set { categories = value; }
 		}
 
-		public virtual IList Comments
+		public virtual IList<Comment> Comments
 		{
 			get { return _comments; }
 			set { _comments = value; }
@@ -140,7 +139,7 @@ namespace NHibernate.Test.ExpressionTest.SubQueries
 
 		public Post()
 		{
-			_comments = new ArrayList();
+			_comments = new List<Comment>();
 		}
 
 		public Post(string title)
@@ -154,9 +153,9 @@ namespace NHibernate.Test.ExpressionTest.SubQueries
 	{
 		private string _userName;
 		private int _userId;
-		private ISet _blogs;
+		private ISet<Blog> _blogs;
 
-		public virtual ISet Blogs
+		public virtual ISet<Blog> Blogs
 		{
 			get { return _blogs; }
 			set { _blogs = value; }
@@ -176,7 +175,7 @@ namespace NHibernate.Test.ExpressionTest.SubQueries
 
 		public User()
 		{
-			_blogs = new HashedSet();
+			_blogs = new HashSet<Blog>();
 		}
 
 		public User(string name)
@@ -190,7 +189,7 @@ namespace NHibernate.Test.ExpressionTest.SubQueries
 	{
 		private int category_id;
 		private string name;
-		private ISet posts = new HashedSet();
+		private ISet<Post> posts = new HashSet<Post>();
 
 		public Category()
 		{
@@ -213,7 +212,7 @@ namespace NHibernate.Test.ExpressionTest.SubQueries
 			set { name = value; }
 		}
 
-		public ISet Posts
+		public ISet<Post> Posts
 		{
 			get { return posts; }
 			set { posts = value; }

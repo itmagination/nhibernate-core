@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Antlr.Runtime;
 using Antlr.Runtime.Tree;
-using Iesi.Collections.Generic;
 
 using NHibernate.Engine;
 using NHibernate.Hql.Ast.ANTLR.Tree;
@@ -18,7 +17,6 @@ using NHibernate.Util;
 
 namespace NHibernate.Hql.Ast.ANTLR
 {
-	[CLSCompliant(false)]
 	public partial class HqlSqlWalker
 	{
 		private static readonly IInternalLogger log = LoggerProvider.LoggerFor(typeof(HqlSqlWalker));
@@ -45,7 +43,7 @@ namespace NHibernate.Hql.Ast.ANTLR
 		private readonly AliasGenerator _aliasGenerator = new AliasGenerator();
 		private readonly ASTPrinter _printer = new ASTPrinter();
 
-		private readonly Set<string> _querySpaces = new HashedSet<string>();
+		private readonly ISet<string> _querySpaces = new HashSet<string>();
 
 		private readonly LiteralProcessor _literalProcessor;
 
@@ -110,7 +108,7 @@ namespace NHibernate.Hql.Ast.ANTLR
 			get { return _aliasGenerator; }
 		}
 
-		public Set<string> QuerySpaces
+		public ISet<string> QuerySpaces
 		{
 			get { return _querySpaces; }
 		}
@@ -230,9 +228,7 @@ namespace NHibernate.Hql.Ast.ANTLR
 				EvaluateAssignment(eq, persister, 0);
 
 				IASTNode setClause = updateStatement.SetClause;
-				IASTNode currentFirstSetElement = setClause.GetFirstChild();
-				setClause.SetFirstChild(eq);
-				eq.NextSibling= currentFirstSetElement;
+				setClause.InsertChild(0, eq);
 			}
 		}
 
@@ -297,9 +293,7 @@ namespace NHibernate.Hql.Ast.ANTLR
 
 				if (idSelectExprNode != null)
 				{
-					IASTNode currentFirstSelectExprNode = selectClause.GetFirstChild();
-					selectClause.SetFirstChild(idSelectExprNode);
-					idSelectExprNode.NextSibling= currentFirstSelectExprNode;
+					selectClause.InsertChild(0, idSelectExprNode);
 
 					insertStatement.IntoClause.PrependIdColumnSpec();
 				}
@@ -344,9 +338,7 @@ namespace NHibernate.Hql.Ast.ANTLR
 					}
 				}
 
-				IASTNode currentFirstSelectExprNode = selectClause.GetFirstChild();
-				selectClause.SetFirstChild(versionValueNode);
-				versionValueNode.NextSibling = currentFirstSelectExprNode;
+				selectClause.InsertChild(0, versionValueNode);
 
 				insertStatement.IntoClause.PrependVersionColumnSpec();
 			}
@@ -363,7 +355,7 @@ namespace NHibernate.Hql.Ast.ANTLR
 		{
 			// TODO NH: we should check the "generated" property
 			// currently only the Hibernate-supplied DbTimestampType is supported here
-			return typeof(TimestampType).IsAssignableFrom(type.GetType());
+			return type is TimestampType;
 		}
 
 		private static bool IsIntegral(IType type)
@@ -376,8 +368,8 @@ namespace NHibernate.Hql.Ast.ANTLR
 
 		public static bool SupportsIdGenWithBulkInsertion(IIdentifierGenerator generator)
 		{
-			return typeof(SequenceGenerator).IsAssignableFrom(generator.GetType()) 
-				|| typeof(IPostInsertIdentifierGenerator).IsAssignableFrom(generator.GetType());
+			return generator is SequenceGenerator 
+				|| generator is IPostInsertIdentifierGenerator;
 		}
 
 		private void PostProcessDML(IRestrictableStatement statement)
@@ -794,32 +786,10 @@ namespace NHibernate.Hql.Ast.ANTLR
 		protected IASTNode LookupProperty(IASTNode dot, bool root, bool inSelect)
 		{
 			DotNode dotNode = (DotNode) dot;
-			FromReferenceNode lhs = dotNode.GetLhs();
-			IASTNode rhs = lhs.NextSibling;
-			switch (rhs.Type)
-			{
-				case ELEMENTS:
-				case INDICES:
-					if (log.IsDebugEnabled)
-					{
-						log.Debug("lookupProperty() " + dotNode.Path + " => " + rhs.Text + "(" + lhs.Path + ")");
-					}
 
-					CollectionFunction f = (CollectionFunction) rhs;
-					// Re-arrange the tree so that the collection function is the root and the lhs is the path.
-
-					f.SetFirstChild(lhs);
-					lhs.NextSibling = null;
-					dotNode.SetFirstChild(f);
-
-					Resolve(lhs); // Don't forget to resolve the argument!
-					f.Resolve(inSelect); // Resolve the collection function now.
-					return f;
-				default:
-					// Resolve everything up to this dot, but don't resolve the placeholders yet.
-					dotNode.ResolveFirstChild();
-					return dotNode;
-			}
+			// Resolve everything up to this dot, but don't resolve the placeholders yet.
+			dotNode.ResolveFirstChild();
+			return dotNode;
 		}
 
 		static void ProcessIndex(IASTNode indexOp)

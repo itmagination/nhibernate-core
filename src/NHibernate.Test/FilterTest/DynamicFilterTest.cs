@@ -1,6 +1,6 @@
 using System;
 using System.Collections;
-using Iesi.Collections;
+using System.Collections.Generic;
 using log4net;
 using NHibernate.Cache;
 using NHibernate.Cache.Entry;
@@ -233,7 +233,7 @@ namespace NHibernate.Test.FilterTest
 
 			log.Info("Performing Load of Department...");
 			Department department = (Department) session.Load(typeof(Department), testData.deptId);
-			ISet salespersons = department.Salespersons;
+			ISet<Salesperson> salespersons = department.Salespersons;
 			Assert.AreEqual(1, salespersons.Count, "Incorrect salesperson count");
 
 			session.Close();
@@ -506,7 +506,7 @@ namespace NHibernate.Test.FilterTest
 				this.outer = outer;
 			}
 
-			public IList entitiesToCleanUp = new ArrayList();
+			public IList<object> entitiesToCleanUp = new List<object>();
 
 			public void Prepare()
 			{

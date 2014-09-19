@@ -26,7 +26,7 @@ namespace NHibernate.Impl
 		private int timeout = RowSelection.NoValue;
 		private int fetchSize = RowSelection.NoValue;
 		private ISessionImplementor session;
-		private IResultTransformer resultTransformer;
+		private IResultTransformer resultTransformer = CriteriaSpecification.RootEntity;
 		private bool cacheable;
 		private string cacheRegion;
 		private CacheMode? cacheMode;
@@ -252,7 +252,7 @@ namespace NHibernate.Impl
 
 		public IList List()
 		{
-			ArrayList results = new ArrayList();
+			var results = new List<object>();
 			List(results);
 			return results;
 		}
@@ -325,7 +325,7 @@ namespace NHibernate.Impl
 			}
 			if (orderEntries.Count != 0)
 			{
-				builder.Append(Environment.NewLine);
+				builder.AppendLine();
 			}
 			first = true;
 			foreach (OrderEntry orderEntry in orderEntries)

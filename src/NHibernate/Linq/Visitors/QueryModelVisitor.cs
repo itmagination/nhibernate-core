@@ -40,6 +40,11 @@ namespace NHibernate.Linq.Visitors
 			// Rewrite non-aggregating group-joins
 			NonAggregatingGroupJoinRewriter.ReWrite(queryModel);
 
+			SubQueryFromClauseFlattener.ReWrite(queryModel);
+
+			// Rewrite left-joins
+			LeftJoinRewriter.ReWrite(queryModel);
+
 			// Rewrite paging
 			PagingRewriter.ReWrite(queryModel);
 
@@ -54,7 +59,7 @@ namespace NHibernate.Linq.Visitors
 
 			// rewrite any operators that should be applied on the outer query
 			// by flattening out the sub-queries that they are located in
-			ResultOperatorRewriterResult result = ResultOperatorRewriter.Rewrite(queryModel);
+			var result = ResultOperatorRewriter.Rewrite(queryModel);
 
 			// Identify and name query sources
 			QuerySourceIdentifier.Visit(parameters.QuerySourceNamer, queryModel);
@@ -182,6 +187,12 @@ namespace NHibernate.Linq.Visitors
 				hqlJoin = _hqlTree.TreeBuilder.LeftJoin(expression, @alias);
 			}
 
+			foreach (var withClause in joinClause.Restrictions)
+			{
+				var booleanExpression = HqlGeneratorExpressionTreeVisitor.Visit(withClause.Predicate, VisitorParameters).AsBooleanExpression();
+				hqlJoin.AddChild(_hqlTree.TreeBuilder.With(booleanExpression));
+			}
+
 			_hqlTree.AddFromClause(hqlJoin);
 		}
 
@@ -225,6 +236,9 @@ namespace NHibernate.Linq.Visitors
 
 		public override void VisitWhereClause(WhereClause whereClause, QueryModel queryModel, int index)
 		{
+			var visitor = new SimplifyConditionalVisitor();
+			whereClause.Predicate = visitor.VisitExpression(whereClause.Predicate);
+
 			// Visit the predicate to build the query
 			var expression = HqlGeneratorExpressionTreeVisitor.Visit(whereClause.Predicate, VisitorParameters).AsBooleanExpression();
 			if (whereClause is NhHavingClause)

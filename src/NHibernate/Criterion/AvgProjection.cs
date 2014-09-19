@@ -24,14 +24,14 @@ namespace NHibernate.Criterion
 			if (projection != null)
 			{
 				parameter =
-					StringHelper.RemoveAsAliasesFromSql(projection.ToSqlString(criteria, loc, criteriaQuery, enabledFilters)).ToString();
+					SqlStringHelper.RemoveAsAliasesFromSql(projection.ToSqlString(criteria, loc, criteriaQuery, enabledFilters)).ToString();
 			}
 			else
 			{
 				parameter = criteriaQuery.GetColumn(criteria, propertyName);
 			}
 			string expression = string.Format("{0}(cast({1} as {2})) as {3}", aggregate, parameter, sqlType,
-			                                  GetColumnAliases(loc)[0]);
+			                                  GetColumnAliases(loc, criteria, criteriaQuery)[0]);
 			return new SqlString(expression);
 		}
 

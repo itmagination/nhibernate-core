@@ -73,7 +73,7 @@ namespace NHibernate.Proxy.Poco
 				{
 					return IdentityEqualityComparer.GetHashCode(proxy);
 				}
-				else if (IsUninitialized && IsEqualToIdentifierMethod(method))
+				else if (IsEqualToIdentifierMethod(method))
 				{
 					return Identifier;
 				}
@@ -111,7 +111,7 @@ namespace NHibernate.Proxy.Poco
 
 					if (Target == null & Session != null)
 					{
-						EntityKey key = new EntityKey(Identifier, Session.Factory.GetEntityPersister(EntityName), Session.EntityMode);
+						EntityKey key = Session.GenerateEntityKey(Identifier, Session.Factory.GetEntityPersister(EntityName));
 						object entity = Session.PersistenceContext.GetEntity(key);
 						if (entity != null)
 							SetImplementation(entity);

@@ -25,7 +25,7 @@ namespace NHibernate.Criterion
 
 		public virtual SqlString ToGroupSqlString(ICriteria criteria, ICriteriaQuery criteriaQuery, IDictionary<string, IFilter> enabledFilters)
 		{
-			return StringHelper.RemoveAsAliasesFromSql(this.projection.ToSqlString(criteria, 0, criteriaQuery, enabledFilters));
+			return SqlStringHelper.RemoveAsAliasesFromSql(this.projection.ToSqlString(criteria, 0, criteriaQuery, enabledFilters));
 		}
 
 		public virtual IType[] GetTypes(ICriteria criteria, ICriteriaQuery criteriaQuery)
@@ -38,12 +38,12 @@ namespace NHibernate.Criterion
 			return this.projection.GetTypes(alias,criteria,criteriaQuery);
 		}
 
-		public virtual string[] GetColumnAliases(int loc)
+		public string[] GetColumnAliases(int position, ICriteria criteria, ICriteriaQuery criteriaQuery)
 		{
-			return projection.GetColumnAliases(loc);
+			return projection.GetColumnAliases(position, criteria, criteriaQuery);
 		}
 
-		public virtual string[] GetColumnAliases(string alias, int loc)
+		public string[] GetColumnAliases(string alias, int position, ICriteria criteria, ICriteriaQuery criteriaQuery)
 		{
 			return null;
 		}

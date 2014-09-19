@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using NHibernate.Dialect;
 using NHibernate.DomainModel.Northwind.Entities;
+using NHibernate.Linq;
 using NUnit.Framework;
 
 namespace NHibernate.Test.Linq.ByMethod
@@ -143,18 +145,71 @@ namespace NHibernate.Test.Linq.ByMethod
 		}
 
 		[Test]
-		[Ignore("Generates incorrect SQL. Reported as NH-3027.")]
+		public void SingleKeyPropertyGroupWithOrderByCount()
+		{
+			// The problem with this test (as of 2014-07-25) is that the generated SQL will
+			// try to select columns that are not included in the group-by clause. But on MySQL and
+			// sqlite, it's apparently ok.
+
+			// The try-catch in this clause aim to ignore the test on dialects where it shouldn't work,
+			// but give us a warning if it does start to work.
+
+			try
+			{
+				var result = db.Orders
+					.GroupBy(o => o.Customer)
+					.OrderByDescending(g => g.Count()) // it seems like there we should do order on client-side
+					.Select(g => g.Key)
+					.ToList();
+
+				Assert.That(result.Count, Is.EqualTo(89));
+			}
+			catch (Exception)
+			{
+				if (Dialect is MySQLDialect || Dialect is SQLiteDialect)
+					throw;
+
+				Assert.Ignore("Known bug NH-3027, discovered as part of NH-2560.");
+			}
+
+			if (Dialect is MySQLDialect || Dialect is SQLiteDialect)
+				return;
+
+			Assert.Fail("Unexpected success in test. Maybe something was fixed and the test needs to be updated?");
+		}
+
+		[Test]
 		public void SingleKeyPropertyGroupByEntityAndSelectEntity()
 		{
-			// NH-3027
+			// The problem with this test (as of 2014-07-25) is that the generated SQL will
+			// try to select columns that are not included in the group-by clause. But on MySQL and
+			// sqlite, it's apparently ok.
 
-			var orderCounts = db.Orders
-				.GroupBy(o => o.Customer)
-				.Select(g => new { Customer = g.Key, OrderCount = g.Count() })
-				.OrderByDescending(t => t.OrderCount)
-				.ToList();
+			// The try-catch in this clause aim to ignore the test on dialects where it shouldn't work,
+			// but give us a warning if it does start to work.
 
-			AssertOrderedBy.Descending(orderCounts, oc => oc.OrderCount);
+			try
+			{
+				var orderCounts = db.Orders
+					.GroupBy(o => o.Customer)
+					.Select(g => new {Customer = g.Key, OrderCount = g.Count()})
+					.OrderByDescending(t => t.OrderCount)
+					.ToList();
+
+				AssertOrderedBy.Descending(orderCounts, oc => oc.OrderCount);
+			}
+			catch (Exception)
+			{
+				if (Dialect is MySQLDialect || Dialect is SQLiteDialect)
+					throw;
+
+				Assert.Ignore("Known bug NH-3027, discovered as part of NH-2560.");
+			}
+
+			if (Dialect is MySQLDialect || Dialect is SQLiteDialect)
+				return;
+
+			Assert.Fail("Unexpected success in test. Maybe something was fixed and the test needs to be updated?");
 		}
 
 		[Test]
@@ -223,17 +278,42 @@ namespace NHibernate.Test.Linq.ByMethod
 			Assert.That(result.Count, Is.EqualTo(62));
 		}
 
+		[Test, KnownBug("NH-3025")]
+		public void SelectTupleKeyCountOfOrderLines()
+		{
+			var list = (from o in db.Orders.ToList()
+						group o by o.OrderDate
+						into g
+						select new
+								   {
+									   g.Key,
+									   Count = g.SelectMany(x => x.OrderLines).Count()
+								   }).ToList();
+
+			var query = (from o in db.Orders
+						group o by o.OrderDate
+						into g
+						select new
+								   {
+									   g.Key,
+									   Count = g.SelectMany(x => x.OrderLines).Count()
+								   }).ToList();
+
+			Assert.That(query.Count, Is.EqualTo(481));
+			Assert.That(query, Is.EquivalentTo(list));
+		}
+
 		[Test]
 		public void GroupByTwoFieldsWhereOneOfThemIsTooDeep()
 		{
 			var query = (from ol in db.OrderLines
 						 let superior = ol.Order.Employee.Superior
-						 group ol by new {ol.Order.OrderId, SuperiorId = superior.EmployeeId}
+						 group ol by new { ol.Order.OrderId, SuperiorId = (int?)superior.EmployeeId }
 						 into temp
 						 select new
 									{
 										OrderId = (int?) temp.Key.OrderId,
-										SuperiorId = (int?) temp.Key.SuperiorId,
+										SuperiorId = temp.Key.SuperiorId,
 										Count = temp.Count(),
 									}).ToList();
 
@@ -264,8 +344,7 @@ namespace NHibernate.Test.Linq.ByMethod
 			Assert.That(results.Count, Is.EqualTo(10));
 		}
 
-		[Test]
-		[Ignore("Generates incorrect expression.")]
+		[Test, KnownBug("NH-????")]
 		public void GroupByAndAll()
 		{
 			//NH-2566
@@ -421,6 +500,25 @@ namespace NHibernate.Test.Linq.ByMethod
 			{
 				return Item1.GetHashCode() ^ Item2.GetHashCode();
 			}
+		}
+
+
+		[Test(Description = "NH-3446"), KnownBug("NH-3446", "NHibernate.HibernateException")]
+		public void GroupByOrderByKeySelectToClass()
+		{
+			db.Products.GroupBy(x => x.Supplier.CompanyName)
+				.OrderBy(x => x.Key)
+				.Select(x => new GroupInfo {Key = x.Key, ItemCount = x.Count(), HasSubgroups = false, Items = x})
+				.ToList();
+		}
+
+
+		private class GroupInfo
+		{
+			public object Key { get; set; }
+			public int ItemCount { get; set; }
+			public bool HasSubgroups { get; set; }
+			public IEnumerable Items { get; set; }
 		}
 	}
 }

@@ -1,14 +1,13 @@
 using System;
-using System.Collections;
-using Iesi.Collections;
+using System.Collections.Generic;
 
 namespace NHibernate.Test.NHSpecificTest.NH593
 {
 	public class Blog
 	{
-		private ISet _posts;
-		private ISet _users;
-		private IDictionary _attributes;
+		private ISet<Post> _posts;
+		private ISet<User> _users;
+		private IDictionary<string, string> _attributes;
 
 		private int blog_id;
 
@@ -26,19 +25,19 @@ namespace NHibernate.Test.NHSpecificTest.NH593
 			set { blog_name = value; }
 		}
 
-		public virtual IDictionary Attributes
+		public virtual IDictionary<string, string> Attributes
 		{
 			get { return _attributes; }
 			set { _attributes = value; }
 		}
 
-		public virtual ISet Posts
+		public virtual ISet<Post> Posts
 		{
 			get { return _posts; }
 			set { _posts = value; }
 		}
 
-		public virtual ISet Users
+		public virtual ISet<User> Users
 		{
 			get { return _users; }
 			set { _users = value; }
@@ -46,9 +45,9 @@ namespace NHibernate.Test.NHSpecificTest.NH593
 
 		public Blog()
 		{
-			_attributes = new Hashtable();
-			_posts = new HashedSet();
-			_users = new HashedSet();
+			_attributes = new Dictionary<string, string>();
+			_posts = new HashSet<Post>();
+			_users = new HashSet<User>();
 		}
 
 		public Blog(string name)
@@ -103,9 +102,9 @@ namespace NHibernate.Test.NHSpecificTest.NH593
 	public class Post
 	{
 		private int post_id;
-		private IList _comments;
+		private IList<Comment> _comments;
 
-		public virtual IList Comments
+		public virtual IList<Comment> Comments
 		{
 			get { return _comments; }
 			set { _comments = value; }
@@ -135,7 +134,7 @@ namespace NHibernate.Test.NHSpecificTest.NH593
 
 		public Post()
 		{
-			_comments = new ArrayList();
+			_comments = new List<Comment>();
 		}
 
 		public Post(string title)
@@ -149,9 +148,9 @@ namespace NHibernate.Test.NHSpecificTest.NH593
 	{
 		private string _userName;
 		private int _userId;
-		private ISet _blogs;
+		private ISet<Blog> _blogs;
 
-		public virtual ISet Blogs
+		public virtual ISet<Blog> Blogs
 		{
 			get { return _blogs; }
 			set { _blogs = value; }
@@ -171,7 +170,7 @@ namespace NHibernate.Test.NHSpecificTest.NH593
 
 		public User()
 		{
-			_blogs = new HashedSet();
+			_blogs = new HashSet<Blog>();
 		}
 
 		public User(string name)

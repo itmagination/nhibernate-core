@@ -1,8 +1,5 @@
 using System;
-using System.Collections;
-
-using Iesi.Collections;
-
+using System.Collections.Generic;
 using NHibernate.Classic;
 
 namespace NHibernate.DomainModel
@@ -19,8 +16,8 @@ namespace NHibernate.DomainModel
 		private bool _loaded;
 		private bool _stored;
 		private string _stuff;
-		private ISet _fums;
-		private IList _moreFums;
+		private ISet<Fum> _fums;
+		private IList<Fum> _moreFums;
 		private Qux _child;
 		private long _childKey;
 		private Holder _holder;
@@ -155,7 +152,7 @@ namespace NHibernate.DomainModel
 		/// <summary>
 		/// Gets or sets the _fums (&lt;set&gt;)
 		/// </summary> 
-		public virtual ISet Fums
+		public virtual ISet<Fum> Fums
 		{
 			get { return _fums; }
 			set { _fums = value; }
@@ -164,7 +161,7 @@ namespace NHibernate.DomainModel
 		/// <summary>
 		/// Gets or sets the _moreFums
 		/// </summary> 
-		public virtual IList MoreFums
+		public virtual IList<Fum> MoreFums
 		{
 			get { return _moreFums; }
 			set { _moreFums = value; }
