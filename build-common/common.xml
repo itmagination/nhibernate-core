@@ -104,6 +104,7 @@
 					// understand it's a pre-release.
 					if (qualifier == "GA") return ToNumericVersion(version);
 					if (qualifier == "SP") return ToNumericVersion(version);
+					if (qualifier == "ITM") return ToNumericVersion(version);
 					
 					return String.Concat(
 						String.Join(".", new string[] { matches.Groups["major"].Value, matches.Groups["minor"].Value, matches.Groups["build"].Value }),
