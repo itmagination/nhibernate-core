@@ -89,9 +89,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ADOException.cs" />
+    <Compile Include="AdoNet\FormatSqlParameterValue.cs" />
+    <Compile Include="AdoNet\SqlClientSqlProperBatchingCommandSet.cs" />
+    <Compile Include="AdoNet\SqlClientBatchingProperBatcher.cs" />
+    <Compile Include="AdoNet\SqlClientBatchingProperBatcherFactory.cs" />
     <Compile Include="AdoNet\MySqlClientBatchingBatcher.cs" />
     <Compile Include="AdoNet\MySqlClientBatchingBatcherFactory.cs" />
     <Compile Include="AdoNet\MySqlClientSqlCommandSet.cs" />
+    <Compile Include="AdoNet\SqlCommandToStringConverter.cs" />
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="AssertionFailure.cs" />
     <Compile Include="Bytecode\DefaultProxyFactoryFactory.cs" />

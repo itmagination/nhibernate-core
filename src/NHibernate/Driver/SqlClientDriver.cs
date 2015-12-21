@@ -170,7 +170,7 @@ namespace NHibernate.Driver
 
 		System.Type IEmbeddedBatcherFactoryProvider.BatcherFactoryClass
 		{
-			get { return typeof(SqlClientBatchingBatcherFactory); }
+            get { return typeof(SqlClientBatchingProperBatcherFactory); }
 		}
 
 		#endregion

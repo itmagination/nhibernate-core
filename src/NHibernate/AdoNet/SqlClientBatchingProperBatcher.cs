@@ -10,15 +10,15 @@ using Environment = NHibernate.Cfg.Environment;
 
 namespace NHibernate.AdoNet
 {
-    public class SqlClientBatchingBatcher : AbstractBatcher
-    {
+    public class SqlClientBatchingProperBatcher : AbstractBatcher
+	{
         private readonly int _defaultTimeout;
         private int _batchSize;
-        private SqlClientSqlCommandSet _currentBatch;
+        private SqlClientSqlProperBatchingCommandSet _currentBatch;
         private StringBuilder _currentBatchCommandsLog;
         private int _totalExpectedRowsAffected;
 
-        public SqlClientBatchingBatcher(ConnectionManager connectionManager, IInterceptor interceptor)
+        public SqlClientBatchingProperBatcher(ConnectionManager connectionManager, IInterceptor interceptor)
             : base(connectionManager, interceptor)
         {
             _batchSize = Factory.Settings.AdoBatchSize;
@@ -101,9 +101,9 @@ namespace NHibernate.AdoNet
             _currentBatch = CreateConfiguredBatch();
         }
 
-        private SqlClientSqlCommandSet CreateConfiguredBatch()
+        private SqlClientSqlProperBatchingCommandSet CreateConfiguredBatch()
         {
-            var result = new SqlClientSqlCommandSet();
+            var result = new SqlClientSqlProperBatchingCommandSet();
             if (_defaultTimeout > 0)
             {
                 try
@@ -127,5 +127,5 @@ namespace NHibernate.AdoNet
 
             return result;
         }
-    }
+	}
 }
