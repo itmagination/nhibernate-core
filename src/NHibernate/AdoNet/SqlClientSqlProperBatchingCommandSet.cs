@@ -17,6 +17,7 @@ namespace NHibernate.AdoNet
 		private int countOfCommands;
         private StringBuilder _sb= new StringBuilder();
 	    private SqlCommand _command;
+        private bool _shouldClearCmd = false;
 
 		static SqlClientSqlProperBatchingCommandSet()
 		{
@@ -37,7 +38,12 @@ namespace NHibernate.AdoNet
 		/// <param name="command"></param>
 		public void Append(SqlCommand command)
 		{
-			AssertHasParameters(command);
+		    if (_shouldClearCmd)
+		    {
+		        _command = null;
+		        _shouldClearCmd = false;
+		    }
+		    AssertHasParameters(command);
 			//doAppend(command);
 		    _sb.AppendLine(SqlCommandToStringConverter.Convert(command));
 			countOfCommands++;
@@ -93,7 +99,7 @@ namespace NHibernate.AdoNet
 		    BatchCommand.CommandText = _sb.ToString();
 		    var ret= BatchCommand.ExecuteNonQuery();
 		    _sb.Clear();
-		    _command = null;
+		    _shouldClearCmd = true;
 		    return ret;
 		}
 
