@@ -2,10 +2,11 @@ using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using NHibernate.AdoNet;
 
 namespace NHibernate.Driver
 {
-	public class Sql2008ClientDriver : SqlClientDriver
+	public class Sql2008ClientDriver : SqlClientDriver, IEmbeddedBatcherFactoryProvider
 	{
 		protected override void InitializeParameter(IDbDataParameter dbParam, string name, SqlTypes.SqlType sqlType)
 		{
@@ -24,5 +25,10 @@ namespace NHibernate.Driver
 				parameter.Value = dateTimeValue.TimeOfDay;
 			}
 		}
+
+        System.Type IEmbeddedBatcherFactoryProvider.BatcherFactoryClass
+        {
+            get { return typeof(SqlClientBatchingProperBatcherFactory); }
+        }
 	}
 }

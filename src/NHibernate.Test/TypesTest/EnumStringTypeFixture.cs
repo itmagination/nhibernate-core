@@ -87,5 +87,21 @@ namespace NHibernate.Test.TypesTest
 
 			s.Close();
 		}
+        [Test]
+        public void Batch()
+        {
+            ISession s = OpenSession();
+
+            for (int i = 0; i < 100; i++)
+            {
+                var tmp = new EnumStringClass
+                {
+                    Id = /*bo 2 id 1 i 2 */ i,
+                    EnumValue = SampleEnum.On
+                };
+                s.Save(tmp);
+            }
+            s.Close();
+        }
 	}
 }

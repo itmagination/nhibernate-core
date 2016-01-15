@@ -1248,6 +1248,8 @@
     <Compile Include="TransformTests\ImplementationOfEqualityTests.cs" />
     <Compile Include="TypesTest\CharClass.cs" />
     <Compile Include="TypesTest\CharClassFixture.cs" />
+    <Compile Include="TypesTest\EnumIntClass.cs" />
+    <Compile Include="TypesTest\EnumIntTypeFixture.cs" />
     <Compile Include="TypesTest\StringTypeWithLengthFixture.cs" />
     <Compile Include="TypesTest\DateTimeClass.cs" />
     <Compile Include="TypesTest\LocalDateTimeTypeFixture.cs" />
@@ -3056,6 +3058,7 @@
     <EmbeddedResource Include="NHSpecificTest\NH1291AnonExample\Mappings.hbm.xml" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="TypesTest\EnumIntClass.hbm.xml" />
     <EmbeddedResource Include="NHSpecificTest\NH3455\Mappings.hbm.xml" />
     <EmbeddedResource Include="NHSpecificTest\NH3590\Mappings.hbm.xml" />
     <EmbeddedResource Include="NHSpecificTest\NH3377\Mappings.hbm.xml" />

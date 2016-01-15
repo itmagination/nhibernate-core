@@ -1,6 +1,7 @@
 using NHibernate.Cfg;
 using NHibernate.Dialect;
 using NHibernate.Engine;
+using NHibernate.Test.NHSpecificTest.Docs.PersistentClasses;
 using NUnit.Framework;
 
 namespace NHibernate.Test.TypesTest

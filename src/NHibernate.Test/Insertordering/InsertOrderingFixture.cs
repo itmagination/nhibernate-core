@@ -79,7 +79,7 @@ namespace NHibernate.Test.Insertordering
 
 		#region Nested type: StatsBatcher
 
-		public class StatsBatcher : SqlClientBatchingBatcher
+        public class StatsBatcher : SqlClientBatchingProperBatcher
 		{
 			private static string batchSQL;
 			private static IList<int> batchSizes = new List<int>();
