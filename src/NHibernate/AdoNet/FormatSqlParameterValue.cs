@@ -31,10 +31,11 @@ namespace NHibernate.AdoNet
 
                 case DbType.AnsiString:
                 case DbType.AnsiStringFixedLength:
+                    return "'" + FormatText(p.Value) + "'";
                 case DbType.String:
                 case DbType.StringFixedLength:
                 case DbType.Xml:
-                    return "'" + FormatText(p.Value) + "'";
+                    return "N'" + FormatText(p.Value) + "'";
 
                 case DbType.DateTime:
                 case DbType.DateTime2:
