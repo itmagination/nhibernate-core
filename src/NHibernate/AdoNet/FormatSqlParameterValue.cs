@@ -22,16 +22,27 @@ namespace NHibernate.AdoNet
                 case DbType.Boolean:
                     return ((bool) p.Value) ? "1" : "0";
 
+                case DbType.SByte:
+                case DbType.Byte:
                 case DbType.Currency:
                 case DbType.Decimal:
                 case DbType.Double:
                 case DbType.VarNumeric:
                 case DbType.Single:
+                case DbType.Int16:
+                case DbType.Int32:
+                case DbType.Int64:
+                case DbType.UInt16:
+                case DbType.UInt32:
+                case DbType.UInt64:
+                    if (p.Value is Enum)
+                        return ((int)p.Value).ToString();
                     return FormatNumeric(p.Value);
 
                 case DbType.AnsiString:
                 case DbType.AnsiStringFixedLength:
                     return "'" + FormatText(p.Value) + "'";
+
                 case DbType.String:
                 case DbType.StringFixedLength:
                 case DbType.Xml:
@@ -43,12 +54,19 @@ namespace NHibernate.AdoNet
 
                 case DbType.DateTimeOffset:
                     return "'" + FormatDateTimeOffset((DateTimeOffset)p.Value) + "'";
-                //case DbType.Time:
-                default:
-
+                
+                case DbType.Date:
+                case DbType.Time:
+                
+                case DbType.Guid:
+                case DbType.Object:
+//                    return "'" + p.Value + "'";              
                     if(p.Value is Enum)
                         return ((int)p.Value).ToString();
                     return "'" + p.Value + "'";
+                default:
+                    throw new NotSupportedException(string.Format("Type:{0} was not expected",p.DbType));
+
             }
         }
 
