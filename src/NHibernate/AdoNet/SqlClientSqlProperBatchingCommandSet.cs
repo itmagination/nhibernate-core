@@ -45,7 +45,7 @@ namespace NHibernate.AdoNet
 		    }
 		    AssertHasParameters(command);
 			//doAppend(command);
-		    _sb.AppendLine(SqlCommandToStringConverter.Convert(command));
+            _sb.AppendLine(SqlCommandToStringConverter.Convert(command, _sb.Length == 0));
 			countOfCommands++;
 		}
 
