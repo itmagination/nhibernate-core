@@ -84,6 +84,11 @@ namespace NHibernate.SqlCommand
 		/// </summary>
 		private readonly int _length;
 
+        /// <summary>
+        /// Indicates if SQL query string has any outer join.
+        /// </summary>
+	    private bool? _hasOuterJoin;
+
 		#endregion
 
 		#region Constructor(s)
@@ -548,6 +553,18 @@ namespace NHibernate.SqlCommand
 		{
 			return new SqlString(ReplaceParts(oldValue, newValue));
 		}
+
+        /// <summary>
+        /// Indicates if SQL query string has any outer join.
+        /// </summary>in
+        public bool HasOuterJoin()
+        {
+            if (_hasOuterJoin.HasValue)
+                return _hasOuterJoin.Value;
+
+            _hasOuterJoin = IndexOf(" outer ", 0, _length, StringComparison.Ordinal) >= 0;
+            return _hasOuterJoin.Value;
+        }
 
 		private IEnumerable<object> ReplaceParts(string oldValue, string newValue)
 		{
