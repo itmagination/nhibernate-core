@@ -144,7 +144,8 @@ namespace NHibernate.Engine.Loading
 		/// complete. 
 		/// </summary>
 		/// <param name="persister">The persister for which to complete loading. </param>
-		public void EndLoadingCollections(ICollectionPersister persister)
+        /// <param name="shouldAddToCache">Indicates if collcetion should be put in cache</param>
+        public void EndLoadingCollections(ICollectionPersister persister, bool shouldAddToCache)
 		{
 			if (!loadContexts.HasLoadingCollectionEntries && (localLoadingCollectionKeys.Count == 0))
 			{
@@ -188,7 +189,7 @@ namespace NHibernate.Engine.Loading
 			}
 			localLoadingCollectionKeys.ExceptWith(toRemove);
 
-			EndLoadingCollections(persister, matches);
+            EndLoadingCollections(persister, matches, shouldAddToCache);
 			if ((localLoadingCollectionKeys.Count == 0))
 			{
 				// todo : hack!!!
@@ -201,7 +202,7 @@ namespace NHibernate.Engine.Loading
 			}
 		}
 
-		private void EndLoadingCollections(ICollectionPersister persister, IList<LoadingCollectionEntry> matchedCollectionEntries)
+		private void EndLoadingCollections(ICollectionPersister persister, IList<LoadingCollectionEntry> matchedCollectionEntries, bool shouldAddToCache)
 		{
 			if (matchedCollectionEntries == null || matchedCollectionEntries.Count == 0)
 			{
@@ -220,7 +221,7 @@ namespace NHibernate.Engine.Loading
 
 			for (int i = 0; i < count; i++)
 			{
-				EndLoadingCollection(matchedCollectionEntries[i], persister);
+				EndLoadingCollection(matchedCollectionEntries[i], persister, shouldAddToCache);
 			}
 
 			if (log.IsDebugEnabled)
@@ -229,7 +230,7 @@ namespace NHibernate.Engine.Loading
 			}
 		}
 
-		private void EndLoadingCollection(LoadingCollectionEntry lce, ICollectionPersister persister)
+		private void EndLoadingCollection(LoadingCollectionEntry lce, ICollectionPersister persister, bool shouldAddToCache)
 		{
 			if (log.IsDebugEnabled)
 			{
@@ -262,7 +263,7 @@ namespace NHibernate.Engine.Loading
 				ce.PostInitialize(lce.Collection);
 			}
 
-			bool addToCache = hasNoQueuedAdds && persister.HasCache && 
+			bool addToCache = shouldAddToCache && hasNoQueuedAdds && persister.HasCache && 
 				((session.CacheMode & CacheMode.Put) == CacheMode.Put) && !ce.IsDoremove; // and this is not a forced initialization during flush
 
 			if (addToCache)
