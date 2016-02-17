@@ -42,11 +42,23 @@ namespace NHibernate.AdoNet
 
         private static void AppendLengthForVarLengthFields(SqlParameter p, StringBuilder query)
         {
-            if (p.SqlDbType == SqlDbType.NVarChar
-                || p.SqlDbType == SqlDbType.VarBinary
-                || p.SqlDbType == SqlDbType.VarChar
-                )
-                query.Append("(" + (p.Size > 4000 ? "MAX" : "4000") + ")");
+            switch (p.SqlDbType)
+            {
+                case SqlDbType.Char:
+                case SqlDbType.NChar:
+                case SqlDbType.Binary:
+                    query.Append("(" + p.Size + ")");
+                    return;
+
+                case SqlDbType.NVarChar:
+                case SqlDbType.VarChar:
+                case SqlDbType.VarBinary:
+                    query.Append("(" + (p.Size > 4000 ? "MAX" : "4000") + ")");
+                    return;
+                case SqlDbType.Decimal:
+                    query.Append("(" + p.Precision + "," + p.Scale + ")");
+                    return;
+            }
         }
 
         private static string BuildCommandQueryForInsert(System.Data.SqlClient.SqlCommand command, bool isFirstCommand)
