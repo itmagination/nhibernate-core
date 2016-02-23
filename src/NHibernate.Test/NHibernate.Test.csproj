@@ -1189,8 +1189,6 @@
     <Compile Include="NHSpecificTest\NH2860\SampleTest.cs" />
     <Compile Include="NHSpecificTest\NH3641\Domain.cs" />
     <Compile Include="NHSpecificTest\NH3641\TestFixture.cs" />
-    <Compile Include="NHSpecificTest\NH3800\Domain.cs" />
-    <Compile Include="NHSpecificTest\NH3800\Fixture.cs" />
     <Compile Include="NHSpecificTest\NH3848\CriteriaTestFixture.cs" />
     <Compile Include="NHSpecificTest\NH3848\Customer.cs" />
     <Compile Include="NHSpecificTest\NH3848\Order.cs" />
