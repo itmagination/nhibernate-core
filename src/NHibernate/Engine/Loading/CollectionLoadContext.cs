@@ -144,8 +144,8 @@ namespace NHibernate.Engine.Loading
 		/// complete. 
 		/// </summary>
 		/// <param name="persister">The persister for which to complete loading. </param>
-        /// <param name="shouldAddToCache">Indicates if collcetion should be put in cache</param>
-        public void EndLoadingCollections(ICollectionPersister persister, bool shouldAddToCache)
+        /// <param name="canAddCollectionsToCache">Indicates if collcetion can be put in cache</param>
+        public void EndLoadingCollections(ICollectionPersister persister, bool canAddCollectionsToCache)
 		{
 			if (!loadContexts.HasLoadingCollectionEntries && (localLoadingCollectionKeys.Count == 0))
 			{
@@ -175,7 +175,7 @@ namespace NHibernate.Engine.Loading
 					if (lce.Collection.Owner == null)
 					{
 						session.PersistenceContext.AddUnownedCollection(new CollectionKey(persister, lce.Key, session.EntityMode),
-						                                                lce.Collection);
+																		lce.Collection);
 					}
 					if (log.IsDebugEnabled)
 					{
@@ -189,7 +189,7 @@ namespace NHibernate.Engine.Loading
 			}
 			localLoadingCollectionKeys.ExceptWith(toRemove);
 
-            EndLoadingCollections(persister, matches, shouldAddToCache);
+            EndLoadingCollections(persister, matches, canAddCollectionsToCache);
 			if ((localLoadingCollectionKeys.Count == 0))
 			{
 				// todo : hack!!!
@@ -202,7 +202,7 @@ namespace NHibernate.Engine.Loading
 			}
 		}
 
-		private void EndLoadingCollections(ICollectionPersister persister, IList<LoadingCollectionEntry> matchedCollectionEntries, bool shouldAddToCache)
+        private void EndLoadingCollections(ICollectionPersister persister, IList<LoadingCollectionEntry> matchedCollectionEntries, bool canAddCollectionsToCache)
 		{
 			if (matchedCollectionEntries == null || matchedCollectionEntries.Count == 0)
 			{
@@ -221,7 +221,7 @@ namespace NHibernate.Engine.Loading
 
 			for (int i = 0; i < count; i++)
 			{
-				EndLoadingCollection(matchedCollectionEntries[i], persister, shouldAddToCache);
+                EndLoadingCollection(matchedCollectionEntries[i], persister, canAddCollectionsToCache);
 			}
 
 			if (log.IsDebugEnabled)
@@ -230,7 +230,7 @@ namespace NHibernate.Engine.Loading
 			}
 		}
 
-		private void EndLoadingCollection(LoadingCollectionEntry lce, ICollectionPersister persister, bool shouldAddToCache)
+        private void EndLoadingCollection(LoadingCollectionEntry lce, ICollectionPersister persister, bool canAddCollectionsToCache)
 		{
 			if (log.IsDebugEnabled)
 			{
@@ -263,7 +263,7 @@ namespace NHibernate.Engine.Loading
 				ce.PostInitialize(lce.Collection);
 			}
 
-			bool addToCache = shouldAddToCache && hasNoQueuedAdds && persister.HasCache && 
+            bool addToCache = canAddCollectionsToCache && hasNoQueuedAdds && persister.HasCache && 
 				((session.CacheMode & CacheMode.Put) == CacheMode.Put) && !ce.IsDoremove; // and this is not a forced initialization during flush
 
 			if (addToCache)

@@ -1189,6 +1189,12 @@
     <Compile Include="NHSpecificTest\NH2860\SampleTest.cs" />
     <Compile Include="NHSpecificTest\NH3641\Domain.cs" />
     <Compile Include="NHSpecificTest\NH3641\TestFixture.cs" />
+    <Compile Include="NHSpecificTest\NH3848\CriteriaTestFixture.cs" />
+    <Compile Include="NHSpecificTest\NH3848\Customer.cs" />
+    <Compile Include="NHSpecificTest\NH3848\Order.cs" />
+    <Compile Include="NHSpecificTest\NH3848\QueryOverTestFixture.cs" />
+    <Compile Include="NHSpecificTest\NH3848\HqlTestFixture.cs" />
+    <Compile Include="NHSpecificTest\NH3848\TestFixture.cs" />
     <Compile Include="NHSpecificTest\Properties\CompositePropertyRefTest.cs" />
     <Compile Include="NHSpecificTest\Properties\DynamicEntityTest.cs" />
     <Compile Include="NHSpecificTest\Properties\Model.cs" />
