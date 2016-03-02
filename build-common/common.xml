@@ -60,7 +60,7 @@
 		effectively SP0).
 	-->
 
-	<property name="project.version" value="4.0.8.ITM" overwrite="false" />
+	<property name="project.version" value="4.0.10.BaseITMR4" overwrite="false" />
 	
 	<!-- This version number should be changed if, but only if, there are incompatible
 	     changes compared to the previous version. -->
@@ -120,6 +120,7 @@
 					const int BaseCR = 3000;
 					const int BaseGA = 4000;
 					const int BaseSP = 4000; // SP is same as GA because GA has no number and SP's start with 1.
+					const int BaseITMR4 = 6000// ITM R4 specific version
 					const int BaseITM = 7000; // ITM specific version
 
 					Match matches = Regex.Match(version, VersionRegex);
@@ -139,6 +140,7 @@
 						case "GA": revisionBase = BaseGA; break;
 						case "SP": revisionBase = BaseSP; break;
 						case "ITM": revisionBase = BaseITM; break;
+						case "ITMR4": revisionBase = BaseITMR4; break;
 						default: throw new BuildException("Unknown version qualifier " + qualifier);
 					}
 
