@@ -10,34 +10,37 @@ namespace NHibernate.AdoNet
         const string valuesText = " VALUES ";
         public static string Convert(System.Data.SqlClient.SqlCommand command, bool isFirstCommand)
         {
-            if (   command.CommandText.StartsWith("DELETE", StringComparison.InvariantCultureIgnoreCase)
-                || command.CommandText.StartsWith("UPDATE", StringComparison.InvariantCultureIgnoreCase))
+            if (command.CommandText.StartsWith("DELETE", StringComparison.OrdinalIgnoreCase)
+                || command.CommandText.StartsWith("UPDATE", StringComparison.OrdinalIgnoreCase))
             {
                 return BuildSpExecCommand(command);
             }
+
             return BuildCommandQueryForInsert(command, isFirstCommand);
         }
 
         private static string BuildSpExecCommand(System.Data.SqlClient.SqlCommand command)
         {
-            StringBuilder query = new StringBuilder("EXECUTE sp_executesql N'" + command.CommandText + "',N'");
+            var queryStringBuilder = new StringBuilder("EXECUTE sp_executesql N'" + command.CommandText + "',N'");
             for (var i = 0; i < command.Parameters.Count; i++)
             {
                 var p = command.Parameters[i];
-                query.Append(p.ParameterName + " " + p.SqlDbType);
-                AppendLengthForVarLengthFields(p, query);
+                queryStringBuilder.Append(p.ParameterName + " " + p.SqlDbType);
+                AppendLengthForVarLengthFields(p, queryStringBuilder);
                 if (i < command.Parameters.Count - 1)
-                    query.Append(",");
+                    queryStringBuilder.Append(",");
             }
-            query.Append("',");
+
+            queryStringBuilder.Append("',");
             for (var i = 0; i < command.Parameters.Count; i++)
             {
                 var p = command.Parameters[i];
-                query.Append(p.ParameterName + "=" + FormatSqlParameterValue.Format(p));
+                queryStringBuilder.Append(p.ParameterName + "=" + FormatSqlParameterValue.Format(p));
                 if (i < command.Parameters.Count - 1)
-                    query.Append(",");
+                    queryStringBuilder.Append(",");
             }
-            return query.ToString();
+
+            return queryStringBuilder.ToString();
         }
 
         private static void AppendLengthForVarLengthFields(SqlParameter p, StringBuilder query)
@@ -75,7 +78,7 @@ namespace NHibernate.AdoNet
 
         private static StringBuilder GetNthQueryCommandText(System.Data.SqlClient.SqlCommand command)
         {
-            var valuesIndex = command.CommandText.IndexOf(valuesText,StringComparison.InvariantCultureIgnoreCase);
+            var valuesIndex = command.CommandText.IndexOf(valuesText, StringComparison.OrdinalIgnoreCase);
             var query = new StringBuilder("," + command.CommandText.Substring(valuesIndex + valuesText.Length));
             return query;
         }

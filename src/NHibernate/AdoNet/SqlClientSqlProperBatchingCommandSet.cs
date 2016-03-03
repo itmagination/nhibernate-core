@@ -17,6 +17,7 @@ namespace NHibernate.AdoNet
 		private int countOfCommands;
         private StringBuilder _sb= new StringBuilder();
 	    private SqlCommand _command;
+        private SqlCommand _firstCommand;
         private bool _shouldClearCmd = false;
 
 		static SqlClientSqlProperBatchingCommandSet()
@@ -47,6 +48,9 @@ namespace NHibernate.AdoNet
 			//doAppend(command);
             _sb.AppendLine(SqlCommandToStringConverter.Convert(command, _sb.Length == 0));
 			countOfCommands++;
+
+            if (countOfCommands == 1)
+                _firstCommand = command;
 		}
 
 		/// <summary>
@@ -96,12 +100,35 @@ namespace NHibernate.AdoNet
 
 			if (CountOfCommands == 0)
 				return 0;
-		    BatchCommand.CommandText = _sb.ToString();
+
+		    PrepareBatchCommandTextAndParameteres();
 		    var ret= BatchCommand.ExecuteNonQuery();
 		    _sb.Clear();
 		    _shouldClearCmd = true;
 		    return ret;
 		}
+
+        private void PrepareBatchCommandTextAndParameteres()
+        {
+            if (CountOfCommands == 1)
+            {
+                //we're doing that because our batched INSERT looks like 'INSERT ... VALUES (...)'
+                //but if we're running batch that has only one command we want to use sp_executesql with parameters.
+                BatchCommand.CommandText = _firstCommand.CommandText;
+                ReplaceBatchCommandParametersWithFirstCommandText();
+            }
+            else
+            {
+                BatchCommand.CommandText = _sb.ToString();
+            }
+        }
+
+        private void ReplaceBatchCommandParametersWithFirstCommandText()
+        {
+            BatchCommand.Parameters.Clear();
+            for (var index = 0; index < _firstCommand.Parameters.Count; index++)
+                BatchCommand.Parameters.Add(((ICloneable)_firstCommand.Parameters[index]).Clone());
+        }
 
 		public SqlConnection Connection
 		{
