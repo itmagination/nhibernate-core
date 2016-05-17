@@ -863,8 +863,6 @@
     <Compile Include="NHSpecificTest\NH3202\Fixture.cs" />
     <Compile Include="NHSpecificTest\NH3604\Entity.cs" />
     <Compile Include="NHSpecificTest\NH3604\FixtureByCode.cs" />
-    <Compile Include="NHSpecificTest\NH3727\Entity.cs" />
-    <Compile Include="NHSpecificTest\NH3727\FixtureByCode.cs" />
     <Compile Include="NHSpecificTest\NH3754\Fixture.cs" />
     <Compile Include="NHSpecificTest\NH3754\Model.cs" />
     <Compile Include="NHSpecificTest\NH3634\Person.cs" />
