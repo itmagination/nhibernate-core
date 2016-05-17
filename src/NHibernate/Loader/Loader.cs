@@ -227,7 +227,7 @@ namespace NHibernate.Loader
 		/// initialize that object. If a collection is supplied, attempt to initialize that collection.
 		/// </summary>
 		private IList DoQueryAndInitializeNonLazyCollections(ISessionImplementor session, QueryParameters queryParameters,
-		                                                     bool returnProxies)
+															 bool returnProxies)
 		{
 			return DoQueryAndInitializeNonLazyCollections(session, queryParameters, returnProxies, null);
 		}
@@ -323,12 +323,12 @@ namespace NHibernate.Loader
 		}
 
 		internal object GetRowFromResultSet(IDataReader resultSet, ISessionImplementor session,
-		                                    QueryParameters queryParameters, LockMode[] lockModeArray,
-		                                    EntityKey optionalObjectKey, IList hydratedObjects, EntityKey[] keys,
-		                                    bool returnProxies)
+											QueryParameters queryParameters, LockMode[] lockModeArray,
+											EntityKey optionalObjectKey, IList hydratedObjects, EntityKey[] keys,
+											bool returnProxies)
 		{
 			return GetRowFromResultSet(resultSet, session, queryParameters, lockModeArray, optionalObjectKey, hydratedObjects,
-			                           keys, returnProxies, null);
+									   keys, returnProxies, null);
 		}
 
 		internal object GetRowFromResultSet(IDataReader resultSet, ISessionImplementor session,
@@ -373,9 +373,9 @@ namespace NHibernate.Loader
 			}
 
 			return forcedResultTransformer == null
-				       ? GetResultColumnOrRow(row, queryParameters.ResultTransformer, resultSet, session)
-				       : forcedResultTransformer.TransformTuple(GetResultRow(row, resultSet, session),
-				                                                ResultRowAliases);
+					   ? GetResultColumnOrRow(row, queryParameters.ResultTransformer, resultSet, session)
+					   : forcedResultTransformer.TransformTuple(GetResultRow(row, resultSet, session),
+																ResultRowAliases);
 		}
 
 		/// <summary>
@@ -661,7 +661,6 @@ namespace NHibernate.Loader
 		/// <summary>
 		/// Are rows transformed immediately after being read from the ResultSet?
 		/// </summary>
-		/// <param name="transformer">The specified result transformer.</param>
 		/// <returns>True, if getResultColumnOrRow() transforms the results; false, otherwise</returns>
 		protected virtual bool AreResultSetRowsTransformedImmediately()
 		{
@@ -755,7 +754,7 @@ namespace NHibernate.Loader
 
 				if (Log.IsDebugEnabled)
 				{
-					Log.Debug("found row of collection: " + MessageHelper.InfoString(persister, collectionRowKey));
+					Log.Debug("found row of collection: " + MessageHelper.CollectionInfoString(persister, collectionRowKey));
 				}
 
 				object owner = optionalOwner;
@@ -787,7 +786,7 @@ namespace NHibernate.Loader
 
 				if (Log.IsDebugEnabled)
 				{
-					Log.Debug("result set contains (possibly empty) collection: " + MessageHelper.InfoString(persister, optionalKey));
+					Log.Debug("result set contains (possibly empty) collection: " + MessageHelper.CollectionInfoString(persister, optionalKey));
 				}
 				persistenceContext.LoadContexts.GetCollectionLoadContext(rs).GetLoadingCollection(persister, optionalKey);
 				// handle empty collection
@@ -798,7 +797,7 @@ namespace NHibernate.Loader
 
 		/// <summary>
 		/// If this is a collection initializer, we need to tell the session that a collection
-		/// is being initilized, to account for the possibility of the collection having
+		/// is being initialized, to account for the possibility of the collection having
 		/// no elements (hence no rows in the result set).
 		/// </summary>
 		internal void HandleEmptyCollections(object[] keys, object resultSetId, ISessionImplementor session)
@@ -818,7 +817,7 @@ namespace NHibernate.Loader
 						if (Log.IsDebugEnabled)
 						{
 							Log.Debug("result set contains (possibly empty) collection: "
-									  + MessageHelper.InfoString(collectionPersisters[j], keys[i]));
+									  + MessageHelper.CollectionInfoString(collectionPersisters[j], keys[i]));
 						}
 						session.PersistenceContext.LoadContexts.GetCollectionLoadContext((IDataReader)resultSetId).GetLoadingCollection(
 							collectionPersisters[j], keys[i]);
@@ -893,9 +892,9 @@ namespace NHibernate.Loader
 
 		/// <summary>
 		/// Resolve any ids for currently loaded objects, duplications within the <c>IDataReader</c>,
-		/// etc. Instanciate empty objects to be initialized from the <c>IDataReader</c>. Return an
+		/// etc. Instantiate empty objects to be initialized from the <c>IDataReader</c>. Return an
 		/// array of objects (a row of results) and an array of booleans (by side-effect) that determine
-		/// wheter the corresponding object should be initialized
+		/// whether the corresponding object should be initialized
 		/// </summary>
 		private object[] GetRow(IDataReader rs, ILoadable[] persisters, EntityKey[] keys, object optionalObject,
 								EntityKey optionalObjectKey, LockMode[] lockModes, IList hydratedObjects,
@@ -1226,7 +1225,7 @@ namespace NHibernate.Loader
 		}
 
 		/// <summary> 
-		/// Some dialect-specific LIMIT clauses require the maximium last row number
+		/// Some dialect-specific LIMIT clauses require the maximum last row number
 		/// (aka, first_row_number + total_row_count), while others require the maximum
 		/// returned row count (the total maximum number of rows to return). 
 		/// </summary>
@@ -1430,7 +1429,7 @@ namespace NHibernate.Loader
 		{
 			if (Log.IsDebugEnabled)
 			{
-				Log.Debug("loading collection: " + MessageHelper.InfoString(CollectionPersisters[0], id));
+				Log.Debug("loading collection: " + MessageHelper.CollectionInfoString(CollectionPersisters[0], id));
 			}
 
 			object[] ids = new object[] { id };
@@ -1447,7 +1446,7 @@ namespace NHibernate.Loader
 			{
 				throw ADOExceptionHelper.Convert(Factory.SQLExceptionConverter, sqle,
 												 "could not initialize a collection: "
-												 + MessageHelper.InfoString(CollectionPersisters[0], id), SqlString);
+												 + MessageHelper.CollectionInfoString(CollectionPersisters[0], id), SqlString);
 			}
 
 			Log.Debug("done loading collection");
@@ -1460,7 +1459,7 @@ namespace NHibernate.Loader
 		{
 			if (Log.IsDebugEnabled)
 			{
-				Log.Debug("batch loading collection: " + MessageHelper.InfoString(CollectionPersisters[0], ids));
+				Log.Debug("batch loading collection: " + MessageHelper.CollectionInfoString(CollectionPersisters[0], ids));
 			}
 
 			IType[] idTypes = new IType[ids.Length];
@@ -1478,7 +1477,7 @@ namespace NHibernate.Loader
 			{
 				throw ADOExceptionHelper.Convert(Factory.SQLExceptionConverter, sqle,
 												 "could not initialize a collection batch: "
-												 + MessageHelper.InfoString(CollectionPersisters[0], ids), SqlString);
+												 + MessageHelper.CollectionInfoString(CollectionPersisters[0], ids), SqlString);
 			}
 
 			Log.Debug("done batch load");
@@ -1506,7 +1505,7 @@ namespace NHibernate.Loader
 			{
 				throw ADOExceptionHelper.Convert(Factory.SQLExceptionConverter, sqle,
 												 "could not load collection by subselect: "
-												 + MessageHelper.InfoString(CollectionPersisters[0], ids), SqlString,
+												 + MessageHelper.CollectionInfoString(CollectionPersisters[0], ids), SqlString,
 												 parameterValues, namedParameters);
 			}
 		}
@@ -1554,13 +1553,13 @@ namespace NHibernate.Loader
 			if (resolvedTransformer != null)
 			{
 				result = (AreResultSetRowsTransformedImmediately()
-					          ? key.ResultTransformer.RetransformResults(
-						          result,
-						          ResultRowAliases,
-						          queryParameters.ResultTransformer,
-						          IncludeInResultRow)
-					          : key.ResultTransformer.UntransformToTuples(result)
-				         );
+							  ? key.ResultTransformer.RetransformResults(
+								  result,
+								  ResultRowAliases,
+								  queryParameters.ResultTransformer,
+								  IncludeInResultRow)
+							  : key.ResultTransformer.UntransformToTuples(result)
+						 );
 			}
 
 			return GetResultList(result, queryParameters.ResultTransformer);
@@ -1570,7 +1569,7 @@ namespace NHibernate.Loader
 		{
 			ISet<FilterKey> filterKeys = FilterKey.CreateFilterKeys(session.EnabledFilters, session.EntityMode);
 			return new QueryKey(Factory, SqlString, queryParameters, filterKeys,
-			                    CreateCacheableResultTransformer(queryParameters));
+								CreateCacheableResultTransformer(queryParameters));
 		}
 
 		private CacheableResultTransformer CreateCacheableResultTransformer(QueryParameters queryParameters)

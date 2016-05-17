@@ -20,8 +20,6 @@ namespace NHibernate.Criterion
         private QueryParameters parameters;
         private IType[] types;
 
-        [NonSerialized] private CriteriaQueryTranslator innerQuery;
-
         protected SubqueryExpression(String op, String quantifier, DetachedCriteria dc)
             : this(op, quantifier, dc, true)
         {
@@ -44,14 +42,21 @@ namespace NHibernate.Criterion
 
         public override SqlString ToSqlString(ICriteria criteria, ICriteriaQuery criteriaQuery, IDictionary<string, IFilter> enabledFilters)
         {
-            InitializeInnerQueryAndParameters(criteriaQuery, true); // Force reinitialization. There can be old instance from earlier Criteria execution or cloned Criteria.
+            ISessionFactoryImplementor factory = criteriaQuery.Factory;
+
+            var innerQuery = new CriteriaQueryTranslator(
+                factory,
+                criteriaImpl, //implicit polymorphism not supported (would need a union)
+                criteriaImpl.EntityOrClassName,
+                criteriaQuery.GenerateSQLAlias(),
+                criteriaQuery);
+
+            types = innerQuery.HasProjection ? innerQuery.ProjectedTypes : null;
 
             if (innerQuery.HasProjection == false)
             {
                 throw new QueryException("Cannot use subqueries on a criteria without a projection.");
             }
-
-            ISessionFactoryImplementor factory = criteriaQuery.Factory;
 
             IOuterJoinLoadable persister = (IOuterJoinLoadable)factory.GetEntityPersister(criteriaImpl.EntityOrClassName);
 
@@ -72,11 +77,6 @@ namespace NHibernate.Criterion
                 Parameter limitParameter = limit.HasValue ? innerQuery.CreateTakeParameter(limit.Value) : null;
                 sql = factory.Dialect.GetLimitString(sql, offset, limit, offsetParameter, limitParameter);
             }
-
-            // during CriteriaImpl.Clone we are doing a shallow copy of each criterion.
-            // this is not a problem for common criterion but not for SubqueryExpression because here we are holding the state of inner CriteriaTraslator (ICriteriaQuery).
-            // After execution (ToSqlString) we have to clean the internal state because the next execution may be performed in a different tree reusing the same istance of SubqueryExpression.
-            innerQuery = null;
 
             SqlStringBuilder buf = new SqlStringBuilder().Add(ToLeftSqlString(criteria, criteriaQuery));
             if (op != null)
@@ -115,23 +115,6 @@ namespace NHibernate.Criterion
         public override IProjection[] GetProjections()
         {
             return null;
-        }
-
-        public void InitializeInnerQueryAndParameters(ICriteriaQuery criteriaQuery, bool forceReinitialization = false)
-        {
-            if (innerQuery == null || forceReinitialization)
-            {
-                ISessionFactoryImplementor factory = criteriaQuery.Factory;
-
-                innerQuery = new CriteriaQueryTranslator(
-                    factory,
-                    criteriaImpl, //implicit polymorphism not supported (would need a union)
-                    criteriaImpl.EntityOrClassName,
-                    criteriaQuery.GenerateSQLAlias(),
-                    criteriaQuery);
-
-                types = innerQuery.HasProjection ? innerQuery.ProjectedTypes : null;
-            }
         }
 
         public ICriteria Criteria

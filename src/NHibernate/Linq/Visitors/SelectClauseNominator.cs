@@ -64,6 +64,12 @@ namespace NHibernate.Linq.Visitors
 					ContainsUntranslatedMethodCalls = ContainsUntranslatedMethodCalls || !isRegisteredFunction;
 				}
 
+				// Attempt to project conditionals to the DB to prevent inner joins, or more projection work on result than is needed
+				if (expression != null && expression.NodeType == ExpressionType.Conditional)
+				{
+					projectConstantsInHql = true;
+				}
+
 				_stateStack.Push(projectConstantsInHql);
 
 				if (expression == null)
@@ -115,13 +121,25 @@ namespace NHibernate.Linq.Visitors
 						   methodCallExpression.Object.NodeType != ExpressionType.Constant; // does not belong to parameter 
 				}
 			}
+			else if (expression.NodeType == (ExpressionType)NhExpressionType.Sum ||
+						expression.NodeType == (ExpressionType)NhExpressionType.Count ||
+						expression.NodeType == (ExpressionType)NhExpressionType.Average ||
+						expression.NodeType == (ExpressionType)NhExpressionType.Max ||
+						expression.NodeType == (ExpressionType)NhExpressionType.Min)
+			{
+				return true;
+			}
 			return false;
+
 		}
 
 		private bool CanBeEvaluatedInHqlSelectStatement(Expression expression, bool projectConstantsInHql)
 		{
 			// HQL can't do New or Member Init
-			if ((expression.NodeType == ExpressionType.MemberInit) || (expression.NodeType == ExpressionType.New))
+			if (expression.NodeType == ExpressionType.MemberInit || 
+				expression.NodeType == ExpressionType.New || 
+				expression.NodeType == ExpressionType.NewArrayInit ||
+				expression.NodeType == ExpressionType.NewArrayBounds)
 			{
 				return false;
 			}

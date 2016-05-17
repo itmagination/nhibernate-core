@@ -142,6 +142,7 @@
     <Compile Include="Connection\DriverConnectionProvider.cs" />
     <Compile Include="Connection\IConnectionProvider.cs" />
     <Compile Include="Connection\UserSuppliedConnectionProvider.cs" />
+    <Compile Include="Dialect\BitwiseFunctionOperation.cs" />
     <Compile Include="Dialect\DB2Dialect.cs" />
     <Compile Include="Dialect\Dialect.cs" />
     <Compile Include="Dialect\FirebirdDialect.cs" />
@@ -161,6 +162,8 @@
     <Compile Include="Dialect\MySQL55InnoDBDialect.cs" />
     <Compile Include="Dialect\MySQL5InnoDBDialect.cs" />
     <Compile Include="Dialect\MySQLDialect.cs" />
+    <Compile Include="Dialect\BitwiseNativeOperation.cs" />
+    <Compile Include="Dialect\Oracle12cDialect.cs" />
     <Compile Include="Dialect\PostgreSQLDialect.cs" />
     <Compile Include="Dialect\Schema\PostgreSQLMetadata.cs" />
     <Compile Include="Dialect\Schema\SchemaHelper.cs" />
@@ -232,6 +235,8 @@
     <Compile Include="FetchMode.cs" />
     <Compile Include="FlushMode.cs" />
     <Compile Include="HibernateException.cs" />
+    <Compile Include="Hql\Ast\ANTLR\HqlFilterPreprocessor.cs" />
+    <Compile Include="Hql\Ast\ANTLR\Tree\ResultVariableRefNode.cs" />
     <Compile Include="Hql\StringQueryExpression.cs" />
     <Compile Include="Hql\Ast\ANTLR\Tree\ComponentJoin.cs" />
     <Compile Include="Hql\ParserHelper.cs" />
@@ -289,6 +294,7 @@
     <Compile Include="Linq\Clauses\NhHavingClause.cs" />
     <Compile Include="Linq\Clauses\NhJoinClause.cs" />
     <Compile Include="Linq\Clauses\NhWithClause.cs" />
+    <Compile Include="Linq\ExpressionExtensions.cs" />
     <Compile Include="Linq\ExpressionTransformers\RemoveCharToIntConversion.cs" />
     <Compile Include="Linq\ExpressionTransformers\RemoveRedundantCast.cs" />
     <Compile Include="Linq\Functions\ConvertGenerator.cs" />
@@ -296,11 +302,16 @@
     <Compile Include="Linq\Functions\MathGenerator.cs" />
     <Compile Include="Linq\Functions\DictionaryGenerator.cs" />
     <Compile Include="Linq\Functions\EqualsGenerator.cs" />
+    <Compile Include="Linq\GroupBy\KeySelectorVisitor.cs" />
     <Compile Include="Linq\GroupBy\PagingRewriter.cs" />
+    <Compile Include="Linq\GroupResultOperatorExtensions.cs" />
     <Compile Include="Linq\NestedSelects\NestedSelectDetector.cs" />
     <Compile Include="Linq\NestedSelects\Tuple.cs" />
     <Compile Include="Linq\NestedSelects\SelectClauseRewriter.cs" />
     <Compile Include="Linq\NestedSelects\ExpressionHolder.cs" />
+    <Compile Include="Linq\ReWriters\ArrayIndexExpressionFlattener.cs" />
+    <Compile Include="Linq\Visitors\IQueryModelRewriterFactory.cs" />
+    <Compile Include="Linq\QueryProviderFactory.cs" />
     <Compile Include="Linq\Visitors\LeftJoinRewriter.cs" />
     <Compile Include="Linq\Functions\CompareGenerator.cs" />
     <Compile Include="Linq\ExpressionTransformers\SimplifyCompareTransformer.cs" />
@@ -315,12 +326,12 @@
     <Compile Include="Linq\Visitors\JoinBuilder.cs" />
     <Compile Include="Linq\Visitors\PagingRewriterSelectClauseVisitor.cs" />
     <Compile Include="Linq\Visitors\PossibleValueSet.cs" />
+    <Compile Include="Linq\Visitors\QueryExpressionSourceIdentifer.cs" />
     <Compile Include="Linq\Visitors\QuerySourceIdentifier.cs" />
-    <Compile Include="Linq\Visitors\ResultOperatorAndOrderByJoinDetector.cs" />
+    <Compile Include="Linq\Visitors\MemberExpressionJoinDetector.cs" />
     <Compile Include="Linq\Visitors\ResultOperatorProcessors\ProcessTimeout.cs" />
     <Compile Include="Linq\Visitors\ResultOperatorProcessors\ProcessAggregateFromSeed.cs" />
     <Compile Include="Linq\NestedSelects\NestedSelectRewriter.cs" />
-    <Compile Include="Linq\Visitors\SelectJoinDetector.cs" />
     <Compile Include="Linq\Visitors\SelectClauseNominator.cs" />
     <Compile Include="Linq\Visitors\SimplifyConditionalVisitor.cs" />
     <Compile Include="Linq\Visitors\SubQueryFromClauseFlattener.cs" />
@@ -358,7 +369,9 @@
     <Compile Include="Mapping\ByCode\Impl\CustomizersImpl\ManyToAnyCustomizer.cs" />
     <Compile Include="Mapping\ByCode\Impl\DynamicComponentMapper.cs" />
     <Compile Include="Mapping\ByCode\Impl\ManyToAnyMapper.cs" />
+    <Compile Include="Mapping\ByCode\OptimisticLockMode.cs" />
     <Compile Include="Mapping\ByCode\Import.cs" />
+    <Compile Include="Mapping\ByCode\PolymorphismType.cs" />
     <Compile Include="Mapping\ByCode\PropertyGeneration.cs" />
     <Compile Include="Mapping\ByCode\PropertyToField.cs" />
     <Compile Include="Mapping\ByCode\SimpleModelInspector.cs" />
@@ -503,6 +516,7 @@
     <Compile Include="Mapping\ByCode\NotFoundMode.cs" />
     <Compile Include="Mapping\ByCode\SchemaAction.cs" />
     <Compile Include="Mapping\ByCode\TypeExtensions.cs" />
+    <Compile Include="Mapping\ByCode\UnsavedValueType.cs" />
     <Compile Include="Mapping\ByCode\VersionGeneration.cs" />
     <Compile Include="Mapping\Collection.cs" />
     <Compile Include="Mapping\Column.cs" />
@@ -528,6 +542,7 @@
     <Compile Include="Mapping\PrimaryKey.cs" />
     <Compile Include="Mapping\PrimitiveArray.cs" />
     <Compile Include="Mapping\Property.cs" />
+    <Compile Include="Mapping\ReferenceDependantValue.cs" />
     <Compile Include="Mapping\RootClass.cs" />
     <Compile Include="Mapping\Set.cs" />
     <Compile Include="Mapping\SimpleValue.cs" />
@@ -542,6 +557,7 @@
     <Compile Include="NonUniqueResultException.cs" />
     <Compile Include="ObjectDeletedException.cs" />
     <Compile Include="ObjectNotFoundException.cs" />
+    <Compile Include="SqlCommand\BackTrackCacheParameterList.cs" />
     <Compile Include="Param\CriteriaNamedParameterSpecification.cs" />
     <Compile Include="Param\IPageableParameterSpecification.cs" />
     <Compile Include="Param\ParametersBackTrackExtensions.cs" />
@@ -1086,7 +1102,6 @@
     <Compile Include="Hql\Ast\ANTLR\Tree\FromReferenceNode.cs" />
     <Compile Include="Hql\Ast\ANTLR\Tree\HqlSqlWalkerNode.cs" />
     <Compile Include="Hql\Ast\ANTLR\Tree\HqlSqlWalkerTreeAdapter.cs" />
-    <Compile Include="Hql\Ast\ANTLR\Tree\HqlSqlWalkerTreeNodeStream.cs" />
     <Compile Include="Hql\Ast\ANTLR\Tree\IASTFactory.cs" />
     <Compile Include="Hql\Ast\ANTLR\Tree\IASTNode.cs" />
     <Compile Include="Hql\Ast\ANTLR\Tree\IBinaryOperatorNode.cs" />
