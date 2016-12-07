@@ -78,7 +78,7 @@ namespace NHibernate.Impl
 		private readonly ISession rootSession;
 
 		[NonSerialized]
-        private IDictionary<EntityMode, SessionImpl> childSessionsByEntityMode;
+		private IDictionary<EntityMode, ISession> childSessionsByEntityMode;
 
 		[NonSerialized]
 		private readonly bool flushBeforeCompletionEnabled;
@@ -371,12 +371,9 @@ namespace NHibernate.Impl
 					{
 						if (childSessionsByEntityMode != null)
 						{
-							foreach (KeyValuePair<EntityMode, SessionImpl> pair in childSessionsByEntityMode)
+							foreach (KeyValuePair<EntityMode, ISession> pair in childSessionsByEntityMode)
 							{
-							    if (!pair.Value.IsClosed)
-							    {
-								    pair.Value.Close();
-							    }
+								pair.Value.Close();
 							}
 						}
 					}
@@ -2245,10 +2242,10 @@ namespace NHibernate.Impl
 
 				CheckAndUpdateSessionStatus();
 
-				SessionImpl rtn = null;
+				ISession rtn = null;
 				if (childSessionsByEntityMode == null)
 				{
-                    childSessionsByEntityMode = new Dictionary<EntityMode, SessionImpl>();
+					childSessionsByEntityMode = new Dictionary<EntityMode, ISession>();
 				}
 				else
 				{
