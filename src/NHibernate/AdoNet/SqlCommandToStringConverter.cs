@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace NHibernate.AdoNet
 {
@@ -66,21 +68,31 @@ namespace NHibernate.AdoNet
 
         private static string BuildCommandQueryForInsert(System.Data.SqlClient.SqlCommand command, bool isFirstCommand)
         {
-            StringBuilder query;
-            query = isFirstCommand ? new StringBuilder(command.CommandText) : GetNthQueryCommandText(command);
-            for (var i = command.Parameters.Count - 1; i >= 0; i--)
-            {
-                var p = command.Parameters[i];
-                query.Replace(p.ParameterName, FormatSqlParameterValue.Format(p));
-            }
-            return query.ToString();
+            string query = isFirstCommand ? command.CommandText : GetNthQueryCommandText(command);
+	        query = ReplaceParameters(query, command.Parameters);
+            return query;
         }
 
-        private static StringBuilder GetNthQueryCommandText(System.Data.SqlClient.SqlCommand command)
+	    private static string ReplaceParameters(string exampleText, SqlParameterCollection commandParameters)
+	    {
+		    StringBuilder regexBuilder = new StringBuilder("(");
+		    IDictionary<string, string> parameterToFormattedValue = new Dictionary<string, string>();
+		    for (var i = commandParameters.Count - 1; i >= 0; i--)
+		    {
+			    var p = commandParameters[i];
+			    regexBuilder.Append(p.ParameterName);
+			    regexBuilder.Append("|");
+			    parameterToFormattedValue.Add(p.ParameterName, FormatSqlParameterValue.Format(p));
+		    }
+		    regexBuilder.Remove(regexBuilder.Length - 1, 1);
+		    regexBuilder.Append(")");
+		    return Regex.Replace(exampleText, regexBuilder.ToString(), match => parameterToFormattedValue[match.Value]);
+	    }
+
+	    private static string GetNthQueryCommandText(System.Data.SqlClient.SqlCommand command)
         {
             var valuesIndex = command.CommandText.IndexOf(valuesText, StringComparison.OrdinalIgnoreCase);
-            var query = new StringBuilder("," + command.CommandText.Substring(valuesIndex + valuesText.Length));
-            return query;
+            return "," + command.CommandText.Substring(valuesIndex + valuesText.Length);
         }
     }
 }
