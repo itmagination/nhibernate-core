@@ -65,7 +65,7 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Antlr3.Runtime, Version=3.1.0.39271, Culture=neutral, PublicKeyToken=3a9cab8f8d22bfb7, processorArchitecture=MSIL">
+    <Reference Include="Antlr3.Runtime, Version=3.1.0.39271, Culture=neutral, PublicKeyToken=3a9cab8f8d22bfb7, processorArchitecture=MSIL" Condition=" '$(Configuration)' == 'Debug' ">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\net\Antlr3.Runtime.dll</HintPath>
     </Reference>
@@ -80,7 +80,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\net\nunit.framework.dll</HintPath>
     </Reference>
-    <Reference Include="Remotion.Linq, Version=1.13.171.1, Culture=neutral, PublicKeyToken=fee00910d6e5f53b, processorArchitecture=MSIL">
+    <Reference Include="Remotion.Linq, Version=1.13.171.1, Culture=neutral, PublicKeyToken=fee00910d6e5f53b, processorArchitecture=MSIL" Condition=" '$(Configuration)' == 'Debug' ">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\net\Remotion.Linq.dll</HintPath>
     </Reference>
@@ -103,6 +103,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SharedAssemblyInfo.cs">
+      <Link>SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Ado\AlmostSimple.cs" />
     <Compile Include="Ado\BatcherFixture.cs" />
     <Compile Include="Ado\VerySimple.cs" />
@@ -228,6 +231,7 @@
     <Compile Include="Criteria\MaterialResource.cs" />
     <Compile Include="Criteria\ProjectionsTest.cs" />
     <Compile Include="Criteria\Reptile.cs" />
+    <Compile Include="CrossThreadTestRunner.cs" />
     <Compile Include="DialectTest\FunctionTests\SubstringSupportFixture.cs" />
     <Compile Include="DialectTest\FunctionTests\SequenceSupportFixture.cs" />
     <Compile Include="DialectTest\Ingres9DialectFixture.cs" />
@@ -255,7 +259,7 @@
     <Compile Include="DynamicProxyTests\InterfaceProxySerializationTests\MyProxyImpl.cs" />
     <Compile Include="DynamicProxyTests\InterfaceProxySerializationTests\ProxyFixture.cs" />
     <Compile Include="DynamicProxyTests\InterfaceWithEqualsGethashcodeTests.cs" />
-    <Compile Include="DynamicProxyTests\LazyFieldInterceptorSerializable.cs" />
+    <Compile Include="DynamicProxyTests\LazyFieldInterceptorTests.cs" />
     <Compile Include="DynamicProxyTests\PassThroughInterceptor.cs" />
     <Compile Include="DynamicProxyTests\PeVerifier.cs" />
     <Compile Include="DynamicProxyTests\ProxiedMembers\Fixture.cs" />
@@ -637,6 +641,8 @@
     <Compile Include="MappingByCode\IntegrationTests\NH3280\OneToOneToInheritedProperty.cs" />
     <Compile Include="MappingByCode\IntegrationTests\NH3667\MapFixture.cs" />
     <Compile Include="MappingByCode\IntegrationTests\NH3667\Model.cs" />
+    <Compile Include="MappingByCode\IntegrationTests\NH3741\MapFixture.cs" />
+    <Compile Include="MappingByCode\IntegrationTests\NH3741\Model.cs" />
     <Compile Include="MappingByCode\MappersTests\AnyMapperTest.cs" />
     <Compile Include="MappingByCode\MappersTests\IdMapperTest.cs" />
     <Compile Include="MappingByCode\MappersTests\ManyToOneMapperTest.cs" />
@@ -718,6 +724,38 @@
     <Compile Include="NHSpecificTest\BagWithLazyExtraAndFilter\Fixture.cs" />
     <Compile Include="Linq\ByMethod\DistinctTests.cs" />
     <Compile Include="Component\Basic\ComponentWithUniqueConstraintTests.cs" />
+    <Compile Include="NHSpecificTest\EntityWithUserTypeCanHaveLinqGenerators\BarExample.cs" />
+    <Compile Include="NHSpecificTest\EntityWithUserTypeCanHaveLinqGenerators\DoubleStringUserType.cs" />
+    <Compile Include="NHSpecificTest\EntityWithUserTypeCanHaveLinqGenerators\EntityWithUserTypeProperty.cs" />
+    <Compile Include="NHSpecificTest\EntityWithUserTypeCanHaveLinqGenerators\EntityWithUserTypePropertyIsEquivalentGenerator.cs" />
+    <Compile Include="NHSpecificTest\EntityWithUserTypeCanHaveLinqGenerators\EntityWithUserTypePropertyGeneratorsRegistry.cs" />
+    <Compile Include="NHSpecificTest\EntityWithUserTypeCanHaveLinqGenerators\ExampleUserType.cs" />
+    <Compile Include="NHSpecificTest\EntityWithUserTypeCanHaveLinqGenerators\Fixture.cs" />
+    <Compile Include="NHSpecificTest\EntityWithUserTypeCanHaveLinqGenerators\FooExample.cs" />
+    <Compile Include="NHSpecificTest\EntityWithUserTypeCanHaveLinqGenerators\IExample.cs" />
+    <Compile Include="NHSpecificTest\NH2204\Model.cs" />
+    <Compile Include="NHSpecificTest\NH2204\Fixture.cs" />
+    <Compile Include="NHSpecificTest\NH3912\BatcherLovingEntity.cs" />
+    <Compile Include="NHSpecificTest\NH3912\ReusableBatcherFixture.cs" />
+    <Compile Include="NHSpecificTest\NH3918\Model.cs" />
+    <Compile Include="NHSpecificTest\NH3918\FixtureByCode.cs" />
+    <Compile Include="NHSpecificTest\NH3414\Entity.cs" />
+    <Compile Include="NHSpecificTest\NH3414\FixtureByCode.cs" />
+    <Compile Include="NHSpecificTest\NH2218\Fixture.cs" />
+    <Compile Include="NHSpecificTest\NH2931\Fixture.cs" />
+    <Compile Include="NHSpecificTest\NH2931\Mappings.cs" />
+    <Compile Include="NHSpecificTest\NH2931\Models.cs" />
+    <Compile Include="NHSpecificTest\NH3046\Fixture.cs" />
+    <Compile Include="NHSpecificTest\NH3046\Model.cs" />
+    <Compile Include="NHSpecificTest\NH3518\ClassWithXmlMember.cs" />
+    <Compile Include="NHSpecificTest\NH3518\XmlColumnTest.cs" />
+    <Compile Include="NHSpecificTest\NH3609\MappingEntity.cs" />
+    <Compile Include="NHSpecificTest\NH3609\Entity.cs" />
+    <Compile Include="NHSpecificTest\NH3609\Fixture.cs" />
+    <Compile Include="NHSpecificTest\NH2167\Entity.cs" />
+    <Compile Include="NHSpecificTest\NH2167\Fixture.cs" />
+    <Compile Include="NHSpecificTest\NH3817\Entity.cs" />
+    <Compile Include="NHSpecificTest\NH3817\Fixture.cs" />
     <Compile Include="NHSpecificTest\NH2839\FixtureByCode.cs" />
     <Compile Include="NHSpecificTest\NH3564\FixtureByCode.cs" />
     <Compile Include="NHSpecificTest\NH3583\Entity.cs" />
@@ -872,6 +910,17 @@
     <Compile Include="NHSpecificTest\NH3727\Entity.cs" />
     <Compile Include="NHSpecificTest\NH3727\FixtureByCode.cs" />
     <Compile Include="NHSpecificTest\NH3795\Fixture.cs" />
+    <Compile Include="NHSpecificTest\NH3844\Domain.cs" />
+    <Compile Include="NHSpecificTest\NH3844\Fixture.cs" />
+    <Compile Include="NHSpecificTest\NH3818\Fixture.cs" />
+    <Compile Include="NHSpecificTest\NH3818\MyLovelyCat.cs" />
+    <Compile Include="NHSpecificTest\NH3874\Fixture.cs" />
+    <Compile Include="NHSpecificTest\NH3874\IntWrapper.cs" />
+    <Compile Include="NHSpecificTest\NH3874\IntWrapperType.cs" />
+    <Compile Include="NHSpecificTest\NH3874\One.cs" />
+    <Compile Include="NHSpecificTest\NH3874\Two.cs" />
+    <Compile Include="NHSpecificTest\NH3909\Entity.cs" />
+    <Compile Include="NHSpecificTest\NH3909\FixtureByCode.cs" />
     <Compile Include="NHSpecificTest\NH646\Domain.cs" />
     <Compile Include="NHSpecificTest\NH646\Fixture.cs" />
     <Compile Include="NHSpecificTest\NH3234\Fixture.cs" />
@@ -1353,6 +1402,7 @@
     <Compile Include="UnionsubclassPolymorphicFormula\Party.cs" />
     <Compile Include="UnionsubclassPolymorphicFormula\Person.cs" />
     <Compile Include="UnionsubclassPolymorphicFormula\UnionSubclassFixture.cs" />
+    <Compile Include="UtilityTest\NullableDictionaryFixture.cs" />
     <Compile Include="UtilityTest\IdentitySetFixture.cs" />
     <Compile Include="UtilityTest\EnumerableExtensionsTests\AnyExtensionTests.cs" />
     <Compile Include="UtilityTest\EnumerableExtensionsTests\FirstExtensionTests.cs" />
@@ -2645,7 +2695,6 @@
     <EmbeddedResource Include="Immutable\EntityWithMutableCollection\NonInverse\ContractVariationUnidir.hbm.xml" />
     <EmbeddedResource Include="Immutable\EntityWithMutableCollection\NonInverse\ContractVariationVersioned.hbm.xml" />
     <EmbeddedResource Include="Immutable\EntityWithMutableCollection\NonInverse\ContractVariationVersionedOneToManyJoin.hbm.xml" />
-    <None Include="NHibernate.Test.build" />
     <None Include="NHibernate.Test.nunit" />
     <None Include="DbScripts\MsSql2008DialectLinqReadonlyCreateScript.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -3154,6 +3203,18 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="TypesTest\EnumIntClass.hbm.xml" />
+    <EmbeddedResource Include="NHSpecificTest\NH2204\Mappings.hbm.xml" />
+    <EmbeddedResource Include="NHSpecificTest\NH3874\Mappings.hbm.xml" />
+    <EmbeddedResource Include="NHSpecificTest\EntityWithUserTypeCanHaveLinqGenerators\Mappings.hbm.xml" />
+    <EmbeddedResource Include="NHSpecificTest\NH2218\Mappings.hbm.xml" />
+    <EmbeddedResource Include="NHSpecificTest\NH3046\Mappings.hbm.xml" />
+    <EmbeddedResource Include="NHSpecificTest\NH3518\Mappings.hbm.xml" />
+    <EmbeddedResource Include="NHSpecificTest\NH3844\Mappings.hbm.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NHSpecificTest\NH3609\Mappings.hbm.xml" />
+    <EmbeddedResource Include="NHSpecificTest\NH3818\Mappings.hbm.xml" />
+    <EmbeddedResource Include="NHSpecificTest\NH3817\Mappings.hbm.xml" />
     <EmbeddedResource Include="NHSpecificTest\NH3666\Mappings.hbm.xml">
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -3279,7 +3340,6 @@
     <EmbeddedResource Include="NHSpecificTest\NH2913\Mappings.hbm.xml">
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="TypesTest\StringClassWithLength.hbm.xml" />
     <EmbeddedResource Include="NHSpecificTest\NH2846\Mappings.hbm.xml" />
     <EmbeddedResource Include="NHSpecificTest\NH1007\Mappings.hbm.xml" />
     <EmbeddedResource Include="NHSpecificTest\NH2907\Mappings.hbm.xml" />
@@ -3369,6 +3429,10 @@
     <EmbeddedResource Include="DriverTest\SqlServerCeEntity.hbm.xml" />
     <EmbeddedResource Include="CollectionTest\NullableValueTypeElementMapFixture.hbm.xml" />
     <EmbeddedResource Include="DriverTest\EntityForMs2008.hbm.xml" />
+    <Content Include="..\NHibernate.DomainModel\ABC.hbm.xml">
+      <Link>ABC.hbm.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="DbScripts\MsSql2012DialectLinqReadonlyCreateScript.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -3724,25 +3788,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Cascade\OneToOneCascadeDelete\Pk\Unidirectional\Hbm\" />
-    <Folder Include="NHSpecificTest\NH3615\" />
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
-      <Visible>False</Visible>
-      <ProductName>Windows Installer 3.1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -3752,12 +3800,4 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <PropertyGroup>
-    <PreBuildEvent>
-    </PreBuildEvent>
-    <PostBuildEvent>copy "$(ProjectDir)App.config" "$(TargetPath).config"
-if exist hibernate.cfg.xml (del hibernate.cfg.xml)
-if exist "$(ProjectDir)hibernate.cfg.xml" (copy "$(ProjectDir)hibernate.cfg.xml" "hibernate.cfg.xml")
-copy /y "..\..\..\NHibernate.DomainModel\ABC.hbm.xml" "ABC.hbm.xml"</PostBuildEvent>
-  </PropertyGroup>
 </Project>
