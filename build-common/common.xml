@@ -112,7 +112,7 @@
 					const int BaseCR = 3000;
 					const int BaseGA = 4000;
 					const int BaseSP = 4000; // SP is same as GA because GA has no number and SP's start with 1.
-					const int BaseITM = 7000; // ITM specific version
+					const int BaseITM = 8000; // ITM specific version
 
 					Match matches = Regex.Match(version, VersionRegex);
 					if (matches.Success == false) throw new BuildException("Unrecognised version number.");
