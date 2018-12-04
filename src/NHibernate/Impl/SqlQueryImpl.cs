@@ -84,7 +84,7 @@ namespace NHibernate.Impl
 			: base(sql, FlushMode.Unspecified, session, parameterMetadata)
 		{
 			queryReturns = new List<INativeSQLQueryReturn>();
-			querySpaces = null;
+			querySpaces = new List<string>();
 			callable = false;
 		}
 
@@ -310,6 +310,22 @@ namespace NHibernate.Impl
 			{
 				After();
 			}
+		}
+
+		public ISQLQuery AddSynchronizedEntityName(string entityName)
+		{
+			if (querySpaces == null || string.IsNullOrEmpty(entityName))
+				return this;
+
+			var persister = Session.Factory.GetEntityPersister(entityName);
+
+			if (persister == null)
+				return this;
+
+			foreach (var querySpace in persister.QuerySpaces)
+				querySpaces.Add(querySpace);
+
+			return this;
 		}
 
 		protected internal override IEnumerable<ITranslator> GetTranslators(ISessionImplementor sessionImplementor, QueryParameters queryParameters)
