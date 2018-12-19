@@ -348,28 +348,28 @@ namespace NHibernate.Test.SqlCommandTest
 		public void GetSubselectStringSimple()
 		{
 			SqlString sql = SqlString.Parse("select col from table where col = test order by col");
-            Assert.AreEqual(" from table where col = test order by col", sql.GetSubselectString().ToString());
+			Assert.AreEqual(" from table where col = test ", sql.GetSubselectString().ToString());
 		}
 
 		[Test]
 		public void GetSubselectStringParameterInOrderBy()
 		{
 			SqlString sql = SqlString.Parse("select col from table where col = test order by ? asc");
-            Assert.AreEqual(" from table where col = test order by ? asc", sql.GetSubselectString().ToString());
+			Assert.AreEqual(" from table where col = test ", sql.GetSubselectString().ToString());
 		}
 
 		[Test]
 		public void GetSubselectStringSimpleEndsWithParameter()
 		{
 			SqlString sql = SqlString.Parse("select col from table where col = ? order by col");
-            Assert.AreEqual(" from table where col = ? order by col", sql.GetSubselectString().ToString());
+			Assert.AreEqual(" from table where col = ? ", sql.GetSubselectString().ToString());
 		}
 
 		[Test]
 		public void GetSubselectStringSimpleParameterInMiddle()
 		{
 			SqlString sql = SqlString.Parse("select col from table where col = ? and foo = bar order by col");
-            Assert.AreEqual(" from table where col = ? and foo = bar order by col", sql.GetSubselectString().ToString());
+			Assert.AreEqual(" from table where col = ? and foo = bar ", sql.GetSubselectString().ToString());
 		}
 
 		[Test]
@@ -377,7 +377,7 @@ namespace NHibernate.Test.SqlCommandTest
 		{
 			SqlString sql =
 				SqlString.Parse("select (select foo from bar where foo=col order by foo) from table where col = ? order by col");
-            Assert.AreEqual(" from table where col = ? order by col", sql.GetSubselectString().ToString());
+			Assert.AreEqual(" from table where col = ? ", sql.GetSubselectString().ToString());
 		}
 
 		[Test]
@@ -386,7 +386,7 @@ namespace NHibernate.Test.SqlCommandTest
 			SqlString sql =
 				SqlString.Parse(
 					"select (select foo from bar where foo=col order by foo) from table where col = (select yadda from blah where yadda=x order by yadda) order by col");
-            Assert.AreEqual(" from table where col = (select yadda from blah where yadda=x order by yadda) order by col",
+			Assert.AreEqual(" from table where col = (select yadda from blah where yadda=x order by yadda) ",
 							sql.GetSubselectString().ToString());
 		}
 
@@ -396,14 +396,14 @@ namespace NHibernate.Test.SqlCommandTest
 			SqlString sql =
 				SqlString.Parse(
 					"select (select (select blah from yadda where blah=foo order by blah) from bar where foo=col order by foo) from table where col = ? order by col");
-            Assert.AreEqual(" from table where col = ? order by col", sql.GetSubselectString().ToString());
+			Assert.AreEqual(" from table where col = ? ", sql.GetSubselectString().ToString());
 		}
 
 		[Test]
 		public void GetSubselectStringWithParenthesisOnlyInWhere()
 		{
 			SqlString sql = SqlString.Parse("select col from table where (col = test) order by col");
-            Assert.AreEqual(" from table where (col = test) order by col", sql.GetSubselectString().ToString());
+			Assert.AreEqual(" from table where (col = test) ", sql.GetSubselectString().ToString());
 		}
 
 		[Test]
@@ -412,7 +412,7 @@ namespace NHibernate.Test.SqlCommandTest
 			SqlString sql =
 				SqlString.Parse(
 					"select (select foo from bar where foo=col order by foo), (select foo from bar where foo=col order by foo) from table where col = ? order by col");
-            Assert.AreEqual(" from table where col = ? order by col", sql.GetSubselectString().ToString());
+			Assert.AreEqual(" from table where col = ? ", sql.GetSubselectString().ToString());
 		}
 
 		[Test]

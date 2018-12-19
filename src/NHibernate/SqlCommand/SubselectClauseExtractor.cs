@@ -94,22 +94,10 @@ namespace NHibernate.SqlCommand
 				AddPart(partEnumerator.Current);
 			}
 
+			RemoveLastOrderByClause();
+
 			return builder.ToSqlString();
 		}
-
-        public SqlString RemoveLastOrderBy()
-        {
-            IEnumerator partEnumerator = sql.GetEnumerator();
-            parenNestCount = 0;
-
-            while (partEnumerator.MoveNext())
-            {
-                AddPart(partEnumerator.Current);
-            }
-
-            RemoveLastOrderByClause();
-            return builder.ToSqlString();
-        }
 
 		public static bool HasOrderBy(SqlString subselect)
 		{
